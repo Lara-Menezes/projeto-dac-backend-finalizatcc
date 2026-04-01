@@ -1,9 +1,15 @@
 package org.example.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "avaliacoes")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Avaliacao {
 
     @Id
@@ -18,38 +24,4 @@ public class Avaliacao {
     @ManyToOne
     @JoinColumn(name = "avaliador_id", nullable = false)
     private Avaliador avaliador;
-
-    // getters e setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Double getNota() {
-        return nota;
-    }
-
-    public void setNota(Double nota) {
-        this.nota = nota;
-    }
-
-    public String getComentario() {
-        return comentario;
-    }
-
-    public void setComentario(String comentario) {
-        this.comentario = comentario;
-    }
-
-    public Avaliador getAvaliador() {
-        return avaliador;
-    }
-
-    public void setAvaliador(Avaliador avaliador) {
-        this.avaliador = avaliador;
-    }
 }

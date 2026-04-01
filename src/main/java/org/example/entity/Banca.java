@@ -1,10 +1,16 @@
 package org.example.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bancas")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Banca {
 
     @Id
@@ -20,46 +26,4 @@ public class Banca {
     @ManyToOne
     @JoinColumn(name = "tcc_id", nullable = false)
     private Tcc tcc;
-
-    // getters e setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public LocalDateTime getData() {
-        return data;
-    }
-
-    public void setData(LocalDateTime data) {
-        this.data = data;
-    }
-
-    public String getLocal() {
-        return local;
-    }
-
-    public void setLocal(String local) {
-        this.local = local;
-    }
-
-    public Double getNotaFinal() {
-        return notaFinal;
-    }
-
-    public void setNotaFinal(Double notaFinal) {
-        this.notaFinal = notaFinal;
-    }
-
-    public Tcc getTcc() {
-        return tcc;
-    }
-
-    public void setTcc(Tcc tcc) {
-        this.tcc = tcc;
-    }
 }

@@ -1,9 +1,14 @@
 package org.example.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "professores")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Professor {
 
     @Id
@@ -16,38 +21,4 @@ public class Professor {
 
     private String areaAtuacao;
     private String titulacao;
-
-    // getters e setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
-    public String getAreaAtuacao() {
-        return areaAtuacao;
-    }
-
-    public void setAreaAtuacao(String areaAtuacao) {
-        this.areaAtuacao = areaAtuacao;
-    }
-
-    public String getTitulacao() {
-        return titulacao;
-    }
-
-    public void setTitulacao(String titulacao) {
-        this.titulacao = titulacao;
-    }
 }
