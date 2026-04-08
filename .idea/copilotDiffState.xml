@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/src/main/java/org/example/dto/response/AlunoResponseDTO.java">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/java/org/example/dto/response/AlunoResponseDTO.java" />
+              <option name="originalContent" value="package org.example.dto.response;&#10;&#10;public class AlunoResponseDTO {&#10;}&#10;" />
+              <option name="updatedContent" value="package org.example.dto.response;&#13;&#10;&#13;&#10;import lombok.AllArgsConstructor;&#13;&#10;import lombok.Data;&#13;&#10;import lombok.NoArgsConstructor;&#13;&#10;&#13;&#10;@Data&#13;&#10;@NoArgsConstructor&#13;&#10;@AllArgsConstructor&#13;&#10;public class AlunoResponseDTO {&#13;&#10;    private Long id;&#13;&#10;    private String nome;&#13;&#10;    private String email;&#13;&#10;    private String matricula;&#13;&#10;    private String curso;&#13;&#10;    private Integer periodo;&#13;&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/src/main/java/org/example/services/ProfessorService.java">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/java/org/example/services/ProfessorService.java" />
+              <option name="originalContent" value="package org.example.services;&#10;&#10;public class ProfessorService {&#10;}&#10;" />
+              <option name="updatedContent" value="package org.example.services;&#13;&#10;&#13;&#10;import lombok.RequiredArgsConstructor;&#13;&#10;import org.example.dto.request.ProfessorRequestDTO;&#13;&#10;import org.example.dto.response.ProfessorResponseDTO;&#13;&#10;import org.example.enums.TipoUsuario;&#13;&#10;import org.example.model.Professor;&#13;&#10;import org.example.model.Usuario;&#13;&#10;import org.example.repositories.ProfessorRepository;&#13;&#10;import org.example.repositories.UsuarioRepository;&#13;&#10;import org.springframework.stereotype.Service;&#13;&#10;&#13;&#10;import java.time.LocalDateTime;&#13;&#10;&#13;&#10;@Service&#13;&#10;@RequiredArgsConstructor&#13;&#10;public class ProfessorService {&#13;&#10;&#13;&#10;    private final ProfessorRepository professorRepository;&#13;&#10;    private final UsuarioRepository usuarioRepository;&#13;&#10;&#13;&#10;    // Adicionar (Create)&#13;&#10;    public ProfessorResponseDTO save(ProfessorRequestDTO request) {&#13;&#10;        // Criar Usuario primeiro&#13;&#10;        Usuario usuario = Usuario.builder()&#13;&#10;                .nome(request.getNome())&#13;&#10;                .email(request.getEmail())&#13;&#10;                .senha(request.getSenha()) // Nota: em produção, criptografar senha&#13;&#10;                .tipo(TipoUsuario.PROFESSOR)&#13;&#10;                .ativo(true)&#13;&#10;                .createdAt(LocalDateTime.now())&#13;&#10;                .build();&#13;&#10;        usuario = usuarioRepository.save(usuario);&#13;&#10;&#13;&#10;        // Criar Professor&#13;&#10;        Professor professor = new Professor();&#13;&#10;        professor.setUsuario(usuario);&#13;&#10;        professor.setAreaAtuacao(request.getAreaAtuacao());&#13;&#10;        professor.setTitulacao(request.getTitulacao());&#13;&#10;        professor = professorRepository.save(professor);&#13;&#10;&#13;&#10;        // Retornar DTO&#13;&#10;        return new ProfessorResponseDTO(&#13;&#10;                professor.getId(),&#13;&#10;                usuario.getNome(),&#13;&#10;                usuario.getEmail(),&#13;&#10;                professor.getAreaAtuacao(),&#13;&#10;                professor.getTitulacao()&#13;&#10;        );&#13;&#10;    }&#13;&#10;&#13;&#10;    // Excluir (Delete)&#13;&#10;    public void deleteById(Long id) {&#13;&#10;        professorRepository.deleteById(id);&#13;&#10;    }&#13;&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
