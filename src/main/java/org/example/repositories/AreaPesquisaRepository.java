@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface AreaPesquisaRepository extends JpaRepository<AreaPesquisa, Long> {
-    Optional<AreaPesquisa> findById(Long Long);
+    Optional<AreaPesquisa> findById(Long id);
     List<AreaPesquisa> findByNome(String nome);
 }
