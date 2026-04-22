@@ -6,6 +6,7 @@ O **Finaliza.TCC** é uma plataforma robusta desenvolvida para orquestrar o cicl
 
 ## 📌 Links do Projeto
 * **Gestão do Projeto (Notion):** [Acompanhe o Cronograma e Backlog](https://www.notion.so/326afc40b9af801abc5fed0cd34c8b30?v=326afc40b9af8001a42a000c6b35f58a&source=copy_link)
+* * **Gestão do Projeto (Trello):** [Acompanhe o Cronograma e Backlog](https://trello.com/b/xtyUn0x3/projeto-desenvolvimento-de-aplicacoed-corporativas)
 
 ---
 
