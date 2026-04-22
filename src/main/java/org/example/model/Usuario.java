@@ -5,7 +5,6 @@ import lombok.*;
 import org.example.enums.TipoUsuario;
 import java.time.LocalDateTime;
 
-
 @Entity
 @Table(name = "usuarios")
 @Getter
@@ -34,4 +33,10 @@ public class Usuario {
     private Boolean ativo;
 
     private LocalDateTime createdAt;
+
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Aluno aluno;
+
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Professor professor;
 }

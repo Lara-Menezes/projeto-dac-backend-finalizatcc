@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface TccRepository extends JpaRepository<Tcc, Long> {
     List<Tcc> findByAlunoId(Long alunoId);
     List<Tcc> findByOrientadorId(Long orientadorId);
+    List<Tcc> findByCoorientadorId(Long coorientadorId);  // Adicione esta linha
     List<Tcc> findByStatus(StatusTcc status);
     Optional<Tcc> findByAreaId(Long areaId);
 }

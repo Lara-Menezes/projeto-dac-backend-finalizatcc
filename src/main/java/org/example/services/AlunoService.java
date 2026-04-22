@@ -1,18 +1,15 @@
 package org.example.services;
 
-
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.AlunoRequestDTO;
 import org.example.dto.response.AlunoResponseDTO;
 import org.example.enums.TipoUsuario;
-import org.example.model.Aluno;
-import org.example.model.Usuario;
-import org.example.repositories.AlunoRepository;
-import org.example.repositories.UsuarioRepository;
+import org.example.model.*;
+import org.example.repositories.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +17,9 @@ public class AlunoService {
 
     private final AlunoRepository alunoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final AvaliadorRepository avaliadorRepository;
+    private final TccRepository tccRepository;
+    private final BancaRepository bancaRepository;
 
     // Adicionar (Create)
     public AlunoResponseDTO save(AlunoRequestDTO request) {
@@ -53,8 +53,28 @@ public class AlunoService {
         );
     }
 
-    // Excluir (Delete)
+    // Excluir (Delete) com cascata
     public void deleteById(Long id) {
+        // Buscar Tccs do aluno
+        List<Tcc> tccs = tccRepository.findByAlunoId(id);
+
+        // Para cada Tcc, deletar dependentes: Avaliadores da Banca, depois Banca, depois Tcc
+        for (Tcc tcc : tccs) {
+            Banca banca = bancaRepository.findByTccId(tcc.getId()).orElse(null);
+            if (banca != null) {
+                List<Avaliador> avaliadoresBanca = avaliadorRepository.findByBancaId(banca.getId());
+                for (Avaliador av : avaliadoresBanca) {
+                    avaliadorRepository.delete(av);
+                }
+                bancaRepository.delete(banca);
+            }
+            tccRepository.delete(tcc);
+        }
+
+        // Deletar o Aluno
         alunoRepository.deleteById(id);
+
+        // **IMPORTANTE: Deletar o Usuario associado**
+        usuarioRepository.deleteById(id);
     }
 }
