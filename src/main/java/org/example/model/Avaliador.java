@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.enums.PapelAvaliador;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "avaliadores")
 @Getter
@@ -28,4 +31,8 @@ public class Avaliador {
     @ManyToOne
     @JoinColumn(name = "professor_id", nullable = false)
     private Professor professor;
+
+    @OneToMany(mappedBy = "avaliador", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<org.example.model.Avaliacao> avaliacoes = new ArrayList<>();
 }
