@@ -6,7 +6,9 @@ import org.example.dto.response.AlunoResponseDTO;
 import org.example.enums.TipoUsuario;
 import org.example.model.*;
 import org.example.repositories.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,14 +22,20 @@ public class AlunoService {
     private final AvaliadorRepository avaliadorRepository;
     private final TccRepository tccRepository;
     private final BancaRepository bancaRepository;
+    private final SubmissaoRepository submissaoRepository;
+    private final ArquivoRepository arquivoRepository;
+    private final FeedbackRepository feedbackRepository;
+    private final AuditoriaRepository auditoriaRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // Adicionar (Create)
+    @Transactional
     public AlunoResponseDTO save(AlunoRequestDTO request) {
         // Criar Usuario primeiro
         Usuario usuario = Usuario.builder()
                 .nome(request.getNome())
                 .email(request.getEmail())
-                .senha(request.getSenha()) // Nota: em produção, criptografar senha
+                .senha(passwordEncoder.encode(request.getSenha())) // ✅ CRIPTOGRAFAR
                 .tipo(TipoUsuario.ALUNO)
                 .ativo(true)
                 .createdAt(LocalDateTime.now())
@@ -54,27 +62,30 @@ public class AlunoService {
     }
 
     // Excluir (Delete) com cascata
+    @Transactional
     public void deleteById(Long id) {
-        // Buscar Tccs do aluno
         List<Tcc> tccs = tccRepository.findByAlunoId(id);
 
-        // Para cada Tcc, deletar dependentes: Avaliadores da Banca, depois Banca, depois Tcc
         for (Tcc tcc : tccs) {
-            Banca banca = bancaRepository.findByTccId(tcc.getId()).orElse(null);
-            if (banca != null) {
-                List<Avaliador> avaliadoresBanca = avaliadorRepository.findByBancaId(banca.getId());
-                for (Avaliador av : avaliadoresBanca) {
-                    avaliadorRepository.delete(av);
-                }
-                bancaRepository.delete(banca);
+            List<Submissao> submissoes = submissaoRepository.findByTccId(tcc.getId());
+            for (Submissao submissao : submissoes) {
+                arquivoRepository.deleteAll(arquivoRepository.findBySubmissaoId(submissao.getId()));
+                feedbackRepository.deleteAll(feedbackRepository.findBySubmissaoId(submissao.getId()));
+                submissaoRepository.delete(submissao);
             }
+
+            bancaRepository.findByTccId(tcc.getId()).ifPresent(banca -> {
+                avaliadorRepository.deleteAll(avaliadorRepository.findByBancaId(banca.getId()));
+                bancaRepository.delete(banca);
+            });
+
             tccRepository.delete(tcc);
         }
 
-        // Deletar o Aluno
-        alunoRepository.deleteById(id);
+        // Remover registros de auditoria antes de deletar o usuario
+        auditoriaRepository.deleteAll(auditoriaRepository.findByUsuarioId(id));
 
-        // **IMPORTANTE: Deletar o Usuario associado**
+        // Usuario tem CascadeType.ALL para Aluno, então deleta ambos
         usuarioRepository.deleteById(id);
     }
 }

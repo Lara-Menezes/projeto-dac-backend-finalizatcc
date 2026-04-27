@@ -5,9 +5,12 @@ import org.example.dto.request.SubmissaoRequestDTO;
 import org.example.dto.response.SubmissaoResponseDTO;
 import org.example.model.Submissao;
 import org.example.model.Tcc;
+import org.example.repositories.ArquivoRepository;
+import org.example.repositories.FeedbackRepository;
 import org.example.repositories.SubmissaoRepository;
 import org.example.repositories.TccRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +20,8 @@ public class SubmissaoService {
 
     private final SubmissaoRepository submissaoRepository;
     private final TccRepository tccRepository;
+    private final ArquivoRepository arquivoRepository;
+    private final FeedbackRepository feedbackRepository;
 
     public SubmissaoResponseDTO save(SubmissaoRequestDTO request) {
         Tcc tcc = tccRepository.findById(request.getTccId())
@@ -42,7 +47,12 @@ public class SubmissaoService {
         );
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        submissaoRepository.deleteById(id);
+        Submissao submissao = submissaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Submissão não encontrada"));
+        arquivoRepository.deleteAll(arquivoRepository.findBySubmissaoId(id));
+        feedbackRepository.deleteAll(feedbackRepository.findBySubmissaoId(id));
+        submissaoRepository.delete(submissao);
     }
 }

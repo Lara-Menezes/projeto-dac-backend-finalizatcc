@@ -10,6 +10,7 @@ import org.example.repositories.AvaliadorRepository;
 import org.example.repositories.BancaRepository;
 import org.example.repositories.ProfessorRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +42,11 @@ public class AvaliadorService {
         );
     }
 
+    @Transactional
     public void deleteById(Long id) {
+        if (!avaliadorRepository.existsById(id)) {
+            throw new RuntimeException("Avaliador não encontrado");
+        }
         avaliadorRepository.deleteById(id);
     }
 }

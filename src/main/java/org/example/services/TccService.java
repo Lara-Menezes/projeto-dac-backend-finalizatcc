@@ -3,15 +3,12 @@ package org.example.services;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.TccRequestDTO;
 import org.example.dto.response.TccResponseDTO;
-import org.example.model.Aluno;
-import org.example.model.AreaPesquisa;
-import org.example.model.Professor;
-import org.example.model.Tcc;
-import org.example.repositories.AlunoRepository;
-import org.example.repositories.AreaPesquisaRepository;
-import org.example.repositories.ProfessorRepository;
-import org.example.repositories.TccRepository;
+import org.example.model.*;
+import org.example.repositories.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +18,11 @@ public class TccService {
     private final AreaPesquisaRepository areaPesquisaRepository;
     private final AlunoRepository alunoRepository;
     private final ProfessorRepository professorRepository;
+    private final BancaRepository bancaRepository;
+    private final AvaliadorRepository avaliadorRepository;
+    private final SubmissaoRepository submissaoRepository;
+    private final ArquivoRepository arquivoRepository;
+    private final FeedbackRepository feedbackRepository;
 
     public TccResponseDTO save(TccRequestDTO request) {
         AreaPesquisa area = null;
@@ -66,7 +68,23 @@ public class TccService {
         );
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        tccRepository.deleteById(id);
+        Tcc tcc = tccRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("TCC não encontrado"));
+
+        List<Submissao> submissoes = submissaoRepository.findByTccId(id);
+        for (Submissao submissao : submissoes) {
+            arquivoRepository.deleteAll(arquivoRepository.findBySubmissaoId(submissao.getId()));
+            feedbackRepository.deleteAll(feedbackRepository.findBySubmissaoId(submissao.getId()));
+            submissaoRepository.delete(submissao);
+        }
+
+        bancaRepository.findByTccId(id).ifPresent(banca -> {
+            avaliadorRepository.deleteAll(avaliadorRepository.findByBancaId(banca.getId()));
+            bancaRepository.delete(banca);
+        });
+
+        tccRepository.delete(tcc);
     }
 }

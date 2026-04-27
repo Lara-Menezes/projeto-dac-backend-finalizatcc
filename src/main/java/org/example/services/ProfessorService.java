@@ -6,7 +6,9 @@ import org.example.dto.response.ProfessorResponseDTO;
 import org.example.enums.TipoUsuario;
 import org.example.model.*;
 import org.example.repositories.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,14 +24,20 @@ public class ProfessorService {
     private final AvaliadorRepository avaliadorRepository;
     private final TccRepository tccRepository;
     private final BancaRepository bancaRepository;
+    private final SubmissaoRepository submissaoRepository;
+    private final ArquivoRepository arquivoRepository;
+    private final FeedbackRepository feedbackRepository;
+    private final AuditoriaRepository auditoriaRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // Adicionar (Create)
+    @Transactional
     public ProfessorResponseDTO save(ProfessorRequestDTO request) {
         // Criar Usuario primeiro
         Usuario usuario = Usuario.builder()
                 .nome(request.getNome())
                 .email(request.getEmail())
-                .senha(request.getSenha()) // Nota: em produção, criptografar senha
+                .senha(passwordEncoder.encode(request.getSenha())) // ✅ CRIPTOGRAFAR
                 .tipo(TipoUsuario.PROFESSOR)
                 .ativo(true)
                 .createdAt(LocalDateTime.now())
@@ -54,37 +62,41 @@ public class ProfessorService {
     }
 
     // Excluir (Delete) com cascata
+    @Transactional
     public void deleteById(Long id) {
-        // Buscar Tccs onde o professor é orientador ou coorientador
+        // Deletar feedbacks dados por este professor (em TCCs de outros)
+        feedbackRepository.deleteAll(feedbackRepository.findByProfessorId(id));
+
+        // Buscar TCCs onde o professor é orientador ou coorientador
         List<Tcc> tccsOrientador = tccRepository.findByOrientadorId(id);
         List<Tcc> tccsCoorientador = tccRepository.findByCoorientadorId(id);
         List<Tcc> tccs = Stream.concat(tccsOrientador.stream(), tccsCoorientador.stream())
                 .distinct()
                 .collect(Collectors.toList());
 
-        // Para cada Tcc, deletar dependentes: Avaliadores da Banca, depois Banca, depois Tcc
         for (Tcc tcc : tccs) {
-            Banca banca = bancaRepository.findByTccId(tcc.getId()).orElse(null);
-            if (banca != null) {
-                List<Avaliador> avaliadoresBanca = avaliadorRepository.findByBancaId(banca.getId());
-                for (Avaliador av : avaliadoresBanca) {
-                    avaliadorRepository.delete(av);
-                }
-                bancaRepository.delete(banca);
+            List<Submissao> submissoes = submissaoRepository.findByTccId(tcc.getId());
+            for (Submissao submissao : submissoes) {
+                arquivoRepository.deleteAll(arquivoRepository.findBySubmissaoId(submissao.getId()));
+                feedbackRepository.deleteAll(feedbackRepository.findBySubmissaoId(submissao.getId()));
+                submissaoRepository.delete(submissao);
             }
+
+            bancaRepository.findByTccId(tcc.getId()).ifPresent(banca -> {
+                avaliadorRepository.deleteAll(avaliadorRepository.findByBancaId(banca.getId()));
+                bancaRepository.delete(banca);
+            });
+
             tccRepository.delete(tcc);
         }
 
-        // Deletar Avaliadores diretos do professor
-        List<Avaliador> avaliadoresProf = avaliadorRepository.findByProfessorId(id);
-        for (Avaliador av : avaliadoresProf) {
-            avaliadorRepository.delete(av);
-        }
+        // Deletar avaliações em bancas de outros TCCs onde este professor era avaliador
+        avaliadorRepository.deleteAll(avaliadorRepository.findByProfessorId(id));
 
-        // Deletar o Professor
-        professorRepository.deleteById(id);
+        // Remover registros de auditoria antes de deletar o usuario
+        auditoriaRepository.deleteAll(auditoriaRepository.findByUsuarioId(id));
 
-        // **IMPORTANTE: Deletar o Usuario associado**
+        // Usuario tem CascadeType.ALL para Professor, então deleta ambos
         usuarioRepository.deleteById(id);
     }
 }

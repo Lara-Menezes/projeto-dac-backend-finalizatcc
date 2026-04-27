@@ -8,6 +8,7 @@ import org.example.model.Submissao;
 import org.example.repositories.ArquivoRepository;
 import org.example.repositories.SubmissaoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -48,7 +49,11 @@ public class ArquivoService {
         );
     }
 
+    @Transactional
     public void deleteById(Long id) {
+        if (!arquivoRepository.existsById(id)) {
+            throw new RuntimeException("Arquivo não encontrado");
+        }
         arquivoRepository.deleteById(id);
     }
 }
