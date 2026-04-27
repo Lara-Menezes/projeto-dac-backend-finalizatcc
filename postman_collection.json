@@ -1,0 +1,554 @@
+{
+  "info": {
+    "_postman_id": "finalizatcc-api-collection",
+    "name": "FinalizaTCC API - Coleção Completa",
+    "description": "Coleção com todos os endpoints da API FinalizaTCC para testes no Postman",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔐 Autenticação",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"joao.silva@ifpb.edu.br\",\n  \"senha\": \"SenhaForte123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Faz o login e retorna um token JWT"
+          }
+        }
+      ]
+    },
+    {
+      "name": "📍 Áreas de Pesquisa",
+      "item": [
+        {
+          "name": "Criar Área de Pesquisa",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Inteligência Artificial\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/areas-pesquisa/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "areas-pesquisa", "create"]
+            }
+          }
+        },
+        {
+          "name": "Deletar Área de Pesquisa",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/areas-pesquisa/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "areas-pesquisa", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👨‍🏫 Professores",
+      "item": [
+        {
+          "name": "Criar Professor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Dr. João Silva\",\n  \"email\": \"joao.silva@ifpb.edu.br\",\n  \"senha\": \"SenhaForte123\",\n  \"areaAtuacao\": \"Engenharia de Software\",\n  \"titulacao\": \"Doutorado\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/professores/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "professores", "create"]
+            }
+          }
+        },
+        {
+          "name": "Deletar Professor",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/professores/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "professores", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👨‍🎓 Alunos",
+      "item": [
+        {
+          "name": "Criar Aluno",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Pedro Silva\",\n  \"email\": \"pedro.silva@academico.ifpb.edu.br\",\n  \"senha\": \"Senha123\",\n  \"matricula\": \"201912340001\",\n  \"curso\": \"Engenharia de Software\",\n  \"periodo\": 8\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/alunos/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alunos", "create"]
+            }
+          }
+        },
+        {
+          "name": "Deletar Aluno",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/alunos/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "alunos", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📚 TCCs",
+      "item": [
+        {
+          "name": "Criar TCC",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Aplicação de IA em Sistemas de Recomendação\",\n  \"resumo\": \"Este trabalho aborda o uso de machine learning para melhorar sistemas de recomendação\",\n  \"areaId\": 1,\n  \"alunoId\": 1,\n  \"orientadorId\": 1,\n  \"coorientadorId\": null,\n  \"status\": \"EM_DESENVOLVIMENTO\",\n  \"dataInicio\": \"2024-01-15\",\n  \"dataFim\": \"2024-12-20\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tccs/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tccs", "create"]
+            }
+          }
+        },
+        {
+          "name": "Deletar TCC",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tccs/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tccs", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎓 Bancas",
+      "item": [
+        {
+          "name": "Criar Banca",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": \"2024-11-20T14:00:00\",\n  \"local\": \"Sala 101 - Bloco A\",\n  \"notaFinal\": 8.5,\n  \"tccId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/bancas/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "bancas", "create"]
+            }
+          }
+        },
+        {
+          "name": "Deletar Banca",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/bancas/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "bancas", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Avaliadores",
+      "item": [
+        {
+          "name": "Criar Avaliador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"papel\": \"AVALIADOR\",\n  \"bancaId\": 1,\n  \"professorId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/avaliadores/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "avaliadores", "create"]
+            },
+            "description": "Valores para papel: PRESIDENTE, AVALIADOR, ORIENTADOR"
+          }
+        },
+        {
+          "name": "Deletar Avaliador",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/avaliadores/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "avaliadores", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⭐ Avaliações",
+      "item": [
+        {
+          "name": "Criar Avaliação",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nota\": 8.5,\n  \"comentario\": \"Excelente trabalho, implementação clara e bem estruturada.\",\n  \"avaliadorId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/avaliacoes/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "avaliacoes", "create"]
+            }
+          }
+        },
+        {
+          "name": "Deletar Avaliação",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/avaliacoes/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "avaliacoes", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📤 Submissões",
+      "item": [
+        {
+          "name": "Criar Submissão",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"versao\": 1,\n  \"dataEnvio\": \"2024-11-10T10:30:00\",\n  \"status\": \"ENVIADO\",\n  \"prazoEntrega\": \"2024-11-20T23:59:59\",\n  \"tccId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/submissoes/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "submissoes", "create"]
+            },
+            "description": "Status válidos: ENVIADO, EM_ANALISE, NECESSITA_CORRECAO, ACEITO"
+          }
+        },
+        {
+          "name": "Deletar Submissão",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/submissoes/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "submissoes", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📁 Arquivos",
+      "item": [
+        {
+          "name": "Criar Arquivo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nomeArquivo\": \"TCC_Pedro_Silva.pdf\",\n  \"caminho\": \"/uploads/2024/11/TCC_Pedro_Silva.pdf\",\n  \"tipo\": \"MANUSCRITO\",\n  \"mimeType\": \"application/pdf\",\n  \"tamanho\": 2048576,\n  \"hashArquivo\": \"a1b2c3d4e5f6\",\n  \"dataUpload\": \"2024-11-10T10:30:00\",\n  \"submissaoId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/arquivos/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "arquivos", "create"]
+            },
+            "description": "Tipos válidos: MANUSCRITO, COMPLEMENTAR, CORRIGIDO"
+          }
+        },
+        {
+          "name": "Deletar Arquivo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/arquivos/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "arquivos", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💬 Feedbacks",
+      "item": [
+        {
+          "name": "Criar Feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comentario\": \"Produto bem desenvolvido, mas faltou mais análise de testes.\",\n  \"nota\": 8.0,\n  \"data\": \"2024-11-15T14:30:00\",\n  \"submissaoId\": 1,\n  \"professorId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/feedbacks/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "feedbacks", "create"]
+            }
+          }
+        },
+        {
+          "name": "Deletar Feedback",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/feedbacks/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "feedbacks", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
+
