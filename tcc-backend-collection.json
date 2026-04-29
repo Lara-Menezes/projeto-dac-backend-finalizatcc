@@ -1,0 +1,959 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "TCC Backend API - Coleção Completa",
+    "description": "Coleção para testes de todas as entidades do sistema de TCC.\n\nOrdem de execução recomendada (respeitar dependências entre entidades):\n1. Áreas de Pesquisa\n2. Usuários (Coordenador standalone)\n3. Alunos\n4. Professores\n5. TCCs\n6. Submissões\n7. Arquivos\n8. Bancas\n9. Avaliadores\n10. Avaliações\n11. Feedbacks\n12. Auditorias\n\nNota: GET e PUT são placeholders — serão funcionais quando implementados no backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",        "value": "http://localhost:8080", "type": "string" },
+    { "key": "areaPesquisaId1","value": "1",                     "type": "string" },
+    { "key": "areaPesquisaId2","value": "2",                     "type": "string" },
+    { "key": "usuarioId1",     "value": "1",                     "type": "string" },
+    { "key": "alunoId1",       "value": "1",                     "type": "string" },
+    { "key": "alunoId2",       "value": "2",                     "type": "string" },
+    { "key": "professorId1",   "value": "1",                     "type": "string" },
+    { "key": "professorId2",   "value": "2",                     "type": "string" },
+    { "key": "professorId3",   "value": "3",                     "type": "string" },
+    { "key": "tccId1",         "value": "1",                     "type": "string" },
+    { "key": "tccId2",         "value": "2",                     "type": "string" },
+    { "key": "submissaoId1",   "value": "1",                     "type": "string" },
+    { "key": "submissaoId2",   "value": "2",                     "type": "string" },
+    { "key": "arquivoId1",     "value": "1",                     "type": "string" },
+    { "key": "arquivoId2",     "value": "2",                     "type": "string" },
+    { "key": "bancaId1",       "value": "1",                     "type": "string" },
+    { "key": "bancaId2",       "value": "2",                     "type": "string" },
+    { "key": "avaliadorId1",   "value": "1",                     "type": "string" },
+    { "key": "avaliadorId2",   "value": "2",                     "type": "string" },
+    { "key": "avaliadorId3",   "value": "3",                     "type": "string" },
+    { "key": "avaliacaoId1",   "value": "1",                     "type": "string" },
+    { "key": "avaliacaoId2",   "value": "2",                     "type": "string" },
+    { "key": "feedbackId1",    "value": "1",                     "type": "string" },
+    { "key": "auditoriaId1",   "value": "1",                     "type": "string" }
+  ],
+  "item": [
+
+    {
+      "name": "01 - Áreas de Pesquisa",
+      "item": [
+        {
+          "name": "Criar Área - Inteligência Artificial",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('areaPesquisaId1', res.id);",
+            "  console.log('areaPesquisaId1 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Inteligência Artificial\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/areas-pesquisa/create", "host": ["{{baseUrl}}"], "path": ["api","areas-pesquisa","create"] }
+          }
+        },
+        {
+          "name": "Criar Área - Engenharia de Software",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('areaPesquisaId2', res.id);",
+            "  console.log('areaPesquisaId2 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Engenharia de Software\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/areas-pesquisa/create", "host": ["{{baseUrl}}"], "path": ["api","areas-pesquisa","create"] }
+          }
+        },
+        {
+          "name": "[FUTURO] GET Listar Todas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/areas-pesquisa", "host": ["{{baseUrl}}"], "path": ["api","areas-pesquisa"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] GET Por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/areas-pesquisa/{{areaPesquisaId1}}", "host": ["{{baseUrl}}"], "path": ["api","areas-pesquisa","{{areaPesquisaId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] PUT Atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Inteligência Artificial e Machine Learning\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/areas-pesquisa/{{areaPesquisaId1}}", "host": ["{{baseUrl}}"], "path": ["api","areas-pesquisa","{{areaPesquisaId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "DELETE Área por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/areas-pesquisa/{{areaPesquisaId2}}", "host": ["{{baseUrl}}"], "path": ["api","areas-pesquisa","{{areaPesquisaId2}}"] },
+            "description": "⚠️ Apaga definitivamente. Use um ID que não tenha TCCs vinculados."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "02 - Usuários (standalone)",
+      "item": [
+        {
+          "name": "Criar Usuário - Coordenador Pedro Alves",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('usuarioId1', res.id);",
+            "  console.log('usuarioId1 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Pedro Alves\",\n  \"email\": \"pedro.alves@universidade.edu.br\",\n  \"senha\": \"coordenador@123\",\n  \"tipo\": \"COORDENADOR\",\n  \"ativo\": true,\n  \"createdAt\": \"2025-01-10T08:00:00\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/usuarios/create", "host": ["{{baseUrl}}"], "path": ["api","usuarios","create"] }
+          }
+        },
+        {
+          "name": "Criar Usuário - Coordenador Fernanda Souza",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Fernanda Souza\",\n  \"email\": \"fernanda.souza@universidade.edu.br\",\n  \"senha\": \"coordenadora@123\",\n  \"tipo\": \"COORDENADOR\",\n  \"ativo\": true,\n  \"createdAt\": \"2025-01-15T09:30:00\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/usuarios/create", "host": ["{{baseUrl}}"], "path": ["api","usuarios","create"] }
+          }
+        },
+        {
+          "name": "[FUTURO] GET Listar Todos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/usuarios", "host": ["{{baseUrl}}"], "path": ["api","usuarios"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] GET Por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/usuarios/{{usuarioId1}}", "host": ["{{baseUrl}}"], "path": ["api","usuarios","{{usuarioId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] PUT Atualizar",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Pedro Alves Silva\",\n  \"email\": \"pedro.alves@universidade.edu.br\",\n  \"senha\": \"novasenha@456\",\n  \"tipo\": \"COORDENADOR\",\n  \"ativo\": true,\n  \"createdAt\": \"2025-01-10T08:00:00\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/usuarios/{{usuarioId1}}", "host": ["{{baseUrl}}"], "path": ["api","usuarios","{{usuarioId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "DELETE Usuário por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/usuarios/{{usuarioId1}}", "host": ["{{baseUrl}}"], "path": ["api","usuarios","{{usuarioId1}}"] },
+            "description": "⚠️ Remove o usuário. Cascade pode remover registros vinculados."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "03 - Alunos",
+      "item": [
+        {
+          "name": "Criar Aluno - João Silva (CC período 8)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('alunoId1', res.id);",
+            "  console.log('alunoId1 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"João Pedro Silva\",\n  \"email\": \"joao.silva@aluno.universidade.edu.br\",\n  \"senha\": \"aluno@123\",\n  \"matricula\": \"2021001001\",\n  \"curso\": \"Ciência da Computação\",\n  \"periodo\": 8\n}" },
+            "url": { "raw": "{{baseUrl}}/api/alunos/create", "host": ["{{baseUrl}}"], "path": ["api","alunos","create"] }
+          }
+        },
+        {
+          "name": "Criar Aluno - Maria Santos (SI período 10)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('alunoId2', res.id);",
+            "  console.log('alunoId2 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Maria Clara Santos\",\n  \"email\": \"maria.santos@aluno.universidade.edu.br\",\n  \"senha\": \"aluna@456\",\n  \"matricula\": \"2019002010\",\n  \"curso\": \"Sistemas de Informação\",\n  \"periodo\": 10\n}" },
+            "url": { "raw": "{{baseUrl}}/api/alunos/create", "host": ["{{baseUrl}}"], "path": ["api","alunos","create"] }
+          }
+        },
+        {
+          "name": "Criar Aluno - Lucas Oliveira (ES período 6)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Lucas Henrique Oliveira\",\n  \"email\": \"lucas.oliveira@aluno.universidade.edu.br\",\n  \"senha\": \"lucas@789\",\n  \"matricula\": \"2022003005\",\n  \"curso\": \"Engenharia de Software\",\n  \"periodo\": 6\n}" },
+            "url": { "raw": "{{baseUrl}}/api/alunos/create", "host": ["{{baseUrl}}"], "path": ["api","alunos","create"] }
+          }
+        },
+        {
+          "name": "[FUTURO] GET Listar Todos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/alunos", "host": ["{{baseUrl}}"], "path": ["api","alunos"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] GET Por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/alunos/{{alunoId1}}", "host": ["{{baseUrl}}"], "path": ["api","alunos","{{alunoId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] PUT Atualizar Aluno",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"João Pedro Silva\",\n  \"email\": \"joao.silva@aluno.universidade.edu.br\",\n  \"senha\": \"aluno@novasenha\",\n  \"matricula\": \"2021001001\",\n  \"curso\": \"Ciência da Computação\",\n  \"periodo\": 9\n}" },
+            "url": { "raw": "{{baseUrl}}/api/alunos/{{alunoId1}}", "host": ["{{baseUrl}}"], "path": ["api","alunos","{{alunoId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "DELETE Aluno por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/alunos/{{alunoId2}}", "host": ["{{baseUrl}}"], "path": ["api","alunos","{{alunoId2}}"] },
+            "description": "⚠️ Cascade também remove o Usuário vinculado."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "04 - Professores",
+      "item": [
+        {
+          "name": "Criar Professor - Dr. Carlos Pereira (orientador)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('professorId1', res.id);",
+            "  console.log('professorId1 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Carlos Eduardo Pereira\",\n  \"email\": \"carlos.pereira@universidade.edu.br\",\n  \"senha\": \"prof@123\",\n  \"areaAtuacao\": \"Engenharia de Software\",\n  \"titulacao\": \"Doutor\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/professores/create", "host": ["{{baseUrl}}"], "path": ["api","professores","create"] }
+          }
+        },
+        {
+          "name": "Criar Professora - Dra. Ana Lima (IA)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('professorId2', res.id);",
+            "  console.log('professorId2 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Ana Paula Lima\",\n  \"email\": \"ana.lima@universidade.edu.br\",\n  \"senha\": \"profa@456\",\n  \"areaAtuacao\": \"Inteligência Artificial\",\n  \"titulacao\": \"Doutora\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/professores/create", "host": ["{{baseUrl}}"], "path": ["api","professores","create"] }
+          }
+        },
+        {
+          "name": "Criar Professor - Dr. Roberto Costa (redes)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('professorId3', res.id);",
+            "  console.log('professorId3 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Roberto Luiz Costa\",\n  \"email\": \"roberto.costa@universidade.edu.br\",\n  \"senha\": \"prof@789\",\n  \"areaAtuacao\": \"Redes de Computadores\",\n  \"titulacao\": \"Mestre\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/professores/create", "host": ["{{baseUrl}}"], "path": ["api","professores","create"] }
+          }
+        },
+        {
+          "name": "[FUTURO] GET Listar Todos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/professores", "host": ["{{baseUrl}}"], "path": ["api","professores"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] GET Por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/professores/{{professorId1}}", "host": ["{{baseUrl}}"], "path": ["api","professores","{{professorId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] PUT Atualizar Professor",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Carlos Eduardo Pereira\",\n  \"email\": \"carlos.pereira@universidade.edu.br\",\n  \"senha\": \"prof@novasenha\",\n  \"areaAtuacao\": \"Engenharia de Software e Qualidade\",\n  \"titulacao\": \"Pós-Doutor\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/professores/{{professorId1}}", "host": ["{{baseUrl}}"], "path": ["api","professores","{{professorId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "DELETE Professor por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/professores/{{professorId3}}", "host": ["{{baseUrl}}"], "path": ["api","professores","{{professorId3}}"] },
+            "description": "⚠️ Cascade também remove o Usuário vinculado."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "05 - TCCs",
+      "item": [
+        {
+          "name": "Criar TCC - João (IA com Carlos)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('tccId1', res.id);",
+            "  console.log('tccId1 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"titulo\": \"Detecção de Anomalias em Redes Usando Redes Neurais\",\n  \"resumo\": \"Este trabalho propõe um modelo de detecção de anomalias em redes de computadores utilizando redes neurais convolucionais, avaliando sua eficiência em cenários reais de ataques.\",\n  \"areaId\": {{areaPesquisaId1}},\n  \"alunoId\": {{alunoId1}},\n  \"orientadorId\": {{professorId1}},\n  \"coorientadorId\": {{professorId2}},\n  \"status\": \"EM_DESENVOLVIMENTO\",\n  \"dataInicio\": \"2025-02-01\",\n  \"dataFim\": \"2025-11-30\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/tccs/create", "host": ["{{baseUrl}}"], "path": ["api","tccs","create"] }
+          }
+        },
+        {
+          "name": "Criar TCC - Maria (ES com Ana)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('tccId2', res.id);",
+            "  console.log('tccId2 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"titulo\": \"Aplicação de DevOps em Equipes Ágeis de Pequeno Porte\",\n  \"resumo\": \"Análise das práticas DevOps e sua aplicabilidade em equipes de desenvolvimento ágil com até 10 membros, identificando benefícios e desafios.\",\n  \"areaId\": {{areaPesquisaId2}},\n  \"alunoId\": {{alunoId2}},\n  \"orientadorId\": {{professorId2}},\n  \"coorientadorId\": null,\n  \"status\": \"EM_BANCA\",\n  \"dataInicio\": \"2024-08-01\",\n  \"dataFim\": \"2025-06-30\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/tccs/create", "host": ["{{baseUrl}}"], "path": ["api","tccs","create"] }
+          }
+        },
+        {
+          "name": "[FUTURO] GET Listar Todos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/tccs", "host": ["{{baseUrl}}"], "path": ["api","tccs"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] GET Por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/tccs/{{tccId1}}", "host": ["{{baseUrl}}"], "path": ["api","tccs","{{tccId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] PUT Atualizar Status do TCC",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"titulo\": \"Detecção de Anomalias em Redes Usando Redes Neurais\",\n  \"resumo\": \"Este trabalho propõe um modelo de detecção de anomalias em redes de computadores utilizando redes neurais convolucionais, avaliando sua eficiência em cenários reais de ataques.\",\n  \"areaId\": {{areaPesquisaId1}},\n  \"alunoId\": {{alunoId1}},\n  \"orientadorId\": {{professorId1}},\n  \"coorientadorId\": {{professorId2}},\n  \"status\": \"EM_BANCA\",\n  \"dataInicio\": \"2025-02-01\",\n  \"dataFim\": \"2025-11-30\"\n}" },
+            "url": { "raw": "{{baseUrl}}/api/tccs/{{tccId1}}", "host": ["{{baseUrl}}"], "path": ["api","tccs","{{tccId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "DELETE TCC por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/tccs/{{tccId2}}", "host": ["{{baseUrl}}"], "path": ["api","tccs","{{tccId2}}"] },
+            "description": "⚠️ Remove o TCC e registros dependentes."
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "06 - Submissões",
+      "item": [
+        {
+          "name": "Criar Submissão - TCC1 Versão 1",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('submissaoId1', res.id);",
+            "  console.log('submissaoId1 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"versao\": 1,\n  \"dataEnvio\": \"2025-04-01T10:00:00\",\n  \"status\": \"ENVIADO\",\n  \"prazoEntrega\": \"2025-04-15T23:59:00\",\n  \"tccId\": {{tccId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/submissoes/create", "host": ["{{baseUrl}}"], "path": ["api","submissoes","create"] }
+          }
+        },
+        {
+          "name": "Criar Submissão - TCC1 Versão 2 (revisada)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('submissaoId2', res.id);",
+            "  console.log('submissaoId2 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"versao\": 2,\n  \"dataEnvio\": \"2025-05-10T14:30:00\",\n  \"status\": \"EM_ANALISE\",\n  \"prazoEntrega\": \"2025-05-25T23:59:00\",\n  \"tccId\": {{tccId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/submissoes/create", "host": ["{{baseUrl}}"], "path": ["api","submissoes","create"] }
+          }
+        },
+        {
+          "name": "[FUTURO] GET Listar Todas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/submissoes", "host": ["{{baseUrl}}"], "path": ["api","submissoes"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] GET Por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/submissoes/{{submissaoId1}}", "host": ["{{baseUrl}}"], "path": ["api","submissoes","{{submissaoId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] PUT Atualizar Status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"versao\": 1,\n  \"dataEnvio\": \"2025-04-01T10:00:00\",\n  \"status\": \"NECESSITA_CORRECAO\",\n  \"prazoEntrega\": \"2025-04-30T23:59:00\",\n  \"tccId\": {{tccId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/submissoes/{{submissaoId1}}", "host": ["{{baseUrl}}"], "path": ["api","submissoes","{{submissaoId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "DELETE Submissão por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/submissoes/{{submissaoId2}}", "host": ["{{baseUrl}}"], "path": ["api","submissoes","{{submissaoId2}}"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "07 - Arquivos",
+      "item": [
+        {
+          "name": "Criar Arquivo - Manuscrito (PDF)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('arquivoId1', res.id);",
+            "  console.log('arquivoId1 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nomeArquivo\": \"tcc_joao_silva_v1.pdf\",\n  \"caminho\": \"/uploads/tccs/2025/tcc_joao_silva_v1.pdf\",\n  \"tipo\": \"MANUSCRITO\",\n  \"mimeType\": \"application/pdf\",\n  \"tamanho\": 2048576,\n  \"hashArquivo\": \"sha256:abc123def456ghi789jkl012mno345pqr678stu901vwx234yz\",\n  \"dataUpload\": \"2025-04-01T10:05:00\",\n  \"submissaoId\": {{submissaoId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/arquivos/create", "host": ["{{baseUrl}}"], "path": ["api","arquivos","create"] }
+          }
+        },
+        {
+          "name": "Criar Arquivo - Complementar (Slides)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('arquivoId2', res.id);",
+            "  console.log('arquivoId2 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nomeArquivo\": \"slides_defesa_joao_v1.pptx\",\n  \"caminho\": \"/uploads/tccs/2025/slides_joao_silva_v1.pptx\",\n  \"tipo\": \"COMPLEMENTAR\",\n  \"mimeType\": \"application/vnd.openxmlformats-officedocument.presentationml.presentation\",\n  \"tamanho\": 5242880,\n  \"hashArquivo\": \"sha256:xyz789abc123def456ghi789jkl012mno345pqr678stu901\",\n  \"dataUpload\": \"2025-04-01T10:10:00\",\n  \"submissaoId\": {{submissaoId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/arquivos/create", "host": ["{{baseUrl}}"], "path": ["api","arquivos","create"] }
+          }
+        },
+        {
+          "name": "[FUTURO] GET Listar Todos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/arquivos", "host": ["{{baseUrl}}"], "path": ["api","arquivos"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] GET Por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/arquivos/{{arquivoId1}}", "host": ["{{baseUrl}}"], "path": ["api","arquivos","{{arquivoId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] PUT Atualizar Arquivo",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nomeArquivo\": \"tcc_joao_silva_v1_corrigido.pdf\",\n  \"caminho\": \"/uploads/tccs/2025/tcc_joao_silva_v1_corrigido.pdf\",\n  \"tipo\": \"CORRIGIDO\",\n  \"mimeType\": \"application/pdf\",\n  \"tamanho\": 2150000,\n  \"hashArquivo\": \"sha256:newHash999updated555version777file888content999hash\",\n  \"dataUpload\": \"2025-05-10T14:35:00\",\n  \"submissaoId\": {{submissaoId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/arquivos/{{arquivoId1}}", "host": ["{{baseUrl}}"], "path": ["api","arquivos","{{arquivoId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "DELETE Arquivo por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/arquivos/{{arquivoId2}}", "host": ["{{baseUrl}}"], "path": ["api","arquivos","{{arquivoId2}}"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "08 - Bancas",
+      "item": [
+        {
+          "name": "Criar Banca - TCC João (sala A101)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('bancaId1', res.id);",
+            "  console.log('bancaId1 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"data\": \"2025-11-20T14:00:00\",\n  \"local\": \"Sala A101 - Bloco de Informática\",\n  \"notaFinal\": null,\n  \"tccId\": {{tccId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/bancas/create", "host": ["{{baseUrl}}"], "path": ["api","bancas","create"] }
+          }
+        },
+        {
+          "name": "Criar Banca - TCC Maria (auditório)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('bancaId2', res.id);",
+            "  console.log('bancaId2 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"data\": \"2025-06-25T10:00:00\",\n  \"local\": \"Auditório Principal - Bloco Central\",\n  \"notaFinal\": null,\n  \"tccId\": {{tccId2}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/bancas/create", "host": ["{{baseUrl}}"], "path": ["api","bancas","create"] }
+          }
+        },
+        {
+          "name": "[FUTURO] GET Listar Todas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/bancas", "host": ["{{baseUrl}}"], "path": ["api","bancas"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] GET Por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/bancas/{{bancaId1}}", "host": ["{{baseUrl}}"], "path": ["api","bancas","{{bancaId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] PUT Atualizar Nota Final",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"data\": \"2025-11-20T14:00:00\",\n  \"local\": \"Sala A101 - Bloco de Informática\",\n  \"notaFinal\": 8.7,\n  \"tccId\": {{tccId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/bancas/{{bancaId1}}", "host": ["{{baseUrl}}"], "path": ["api","bancas","{{bancaId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "DELETE Banca por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/bancas/{{bancaId2}}", "host": ["{{baseUrl}}"], "path": ["api","bancas","{{bancaId2}}"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "09 - Avaliadores",
+      "item": [
+        {
+          "name": "Criar Avaliador - Carlos como ORIENTADOR",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('avaliadorId1', res.id);",
+            "  console.log('avaliadorId1 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"papel\": \"ORIENTADOR\",\n  \"bancaId\": {{bancaId1}},\n  \"professorId\": {{professorId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/avaliadores/create", "host": ["{{baseUrl}}"], "path": ["api","avaliadores","create"] }
+          }
+        },
+        {
+          "name": "Criar Avaliador - Ana como PRESIDENTE",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('avaliadorId2', res.id);",
+            "  console.log('avaliadorId2 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"papel\": \"PRESIDENTE\",\n  \"bancaId\": {{bancaId1}},\n  \"professorId\": {{professorId2}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/avaliadores/create", "host": ["{{baseUrl}}"], "path": ["api","avaliadores","create"] }
+          }
+        },
+        {
+          "name": "Criar Avaliador - Roberto como AVALIADOR",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('avaliadorId3', res.id);",
+            "  console.log('avaliadorId3 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"papel\": \"AVALIADOR\",\n  \"bancaId\": {{bancaId1}},\n  \"professorId\": {{professorId3}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/avaliadores/create", "host": ["{{baseUrl}}"], "path": ["api","avaliadores","create"] }
+          }
+        },
+        {
+          "name": "[FUTURO] GET Listar Todos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/avaliadores", "host": ["{{baseUrl}}"], "path": ["api","avaliadores"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] GET Por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/avaliadores/{{avaliadorId1}}", "host": ["{{baseUrl}}"], "path": ["api","avaliadores","{{avaliadorId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] PUT Atualizar Papel",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"papel\": \"AVALIADOR\",\n  \"bancaId\": {{bancaId1}},\n  \"professorId\": {{professorId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/avaliadores/{{avaliadorId1}}", "host": ["{{baseUrl}}"], "path": ["api","avaliadores","{{avaliadorId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "DELETE Avaliador por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/avaliadores/{{avaliadorId3}}", "host": ["{{baseUrl}}"], "path": ["api","avaliadores","{{avaliadorId3}}"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "10 - Avaliações",
+      "item": [
+        {
+          "name": "Criar Avaliação - Carlos (nota 9.0)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('avaliacaoId1', res.id);",
+            "  console.log('avaliacaoId1 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nota\": 9.0,\n  \"comentario\": \"Excelente trabalho. O aluno demonstrou domínio completo do tema e a metodologia foi bem aplicada. A apresentação foi clara e objetiva.\",\n  \"avaliadorId\": {{avaliadorId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/avaliacoes/create", "host": ["{{baseUrl}}"], "path": ["api","avaliacoes","create"] }
+          }
+        },
+        {
+          "name": "Criar Avaliação - Ana (nota 8.5)",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('avaliacaoId2', res.id);",
+            "  console.log('avaliacaoId2 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nota\": 8.5,\n  \"comentario\": \"Bom trabalho, com contribuições relevantes para a área. Recomendo a publicação de um artigo com os resultados obtidos.\",\n  \"avaliadorId\": {{avaliadorId2}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/avaliacoes/create", "host": ["{{baseUrl}}"], "path": ["api","avaliacoes","create"] }
+          }
+        },
+        {
+          "name": "[FUTURO] GET Listar Todas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/avaliacoes", "host": ["{{baseUrl}}"], "path": ["api","avaliacoes"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] GET Por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/avaliacoes/{{avaliacaoId1}}", "host": ["{{baseUrl}}"], "path": ["api","avaliacoes","{{avaliacaoId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] PUT Atualizar Nota",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nota\": 9.5,\n  \"comentario\": \"Revisão: após análise mais detalhada, elevo a nota. Trabalho excepcional.\",\n  \"avaliadorId\": {{avaliadorId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/avaliacoes/{{avaliacaoId1}}", "host": ["{{baseUrl}}"], "path": ["api","avaliacoes","{{avaliacaoId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "DELETE Avaliação por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/avaliacoes/{{avaliacaoId2}}", "host": ["{{baseUrl}}"], "path": ["api","avaliacoes","{{avaliacaoId2}}"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "11 - Feedbacks",
+      "item": [
+        {
+          "name": "Criar Feedback - Carlos para Submissão 1",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('feedbackId1', res.id);",
+            "  console.log('feedbackId1 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"comentario\": \"A fundamentação teórica está boa, mas a seção de resultados precisa de mais detalhes estatísticos. Revise também as referências para seguir a norma ABNT corretamente.\",\n  \"nota\": 7.5,\n  \"data\": \"2025-04-10T16:00:00\",\n  \"submissaoId\": {{submissaoId1}},\n  \"professorId\": {{professorId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/feedbacks/create", "host": ["{{baseUrl}}"], "path": ["api","feedbacks","create"] }
+          }
+        },
+        {
+          "name": "Criar Feedback - Ana para Submissão 2",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"comentario\": \"Ótima melhoria em relação à versão anterior. O texto ficou mais objetivo e a análise dos dados está bem embasada. Aprovado para defesa.\",\n  \"nota\": 9.0,\n  \"data\": \"2025-05-20T11:00:00\",\n  \"submissaoId\": {{submissaoId2}},\n  \"professorId\": {{professorId2}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/feedbacks/create", "host": ["{{baseUrl}}"], "path": ["api","feedbacks","create"] }
+          }
+        },
+        {
+          "name": "[FUTURO] GET Listar Todos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/feedbacks", "host": ["{{baseUrl}}"], "path": ["api","feedbacks"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] GET Por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/feedbacks/{{feedbackId1}}", "host": ["{{baseUrl}}"], "path": ["api","feedbacks","{{feedbackId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] PUT Atualizar Feedback",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"comentario\": \"Atualização: todas as correções foram feitas de forma satisfatória. Trabalho aprovado com louvor.\",\n  \"nota\": 9.5,\n  \"data\": \"2025-04-10T16:00:00\",\n  \"submissaoId\": {{submissaoId1}},\n  \"professorId\": {{professorId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/feedbacks/{{feedbackId1}}", "host": ["{{baseUrl}}"], "path": ["api","feedbacks","{{feedbackId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "DELETE Feedback por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/feedbacks/{{feedbackId1}}", "host": ["{{baseUrl}}"], "path": ["api","feedbacks","{{feedbackId1}}"] }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "12 - Auditorias",
+      "item": [
+        {
+          "name": "Criar Auditoria - Criação do TCC1",
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.response.code === 201) {",
+            "  const res = pm.response.json();",
+            "  pm.collectionVariables.set('auditoriaId1', res.id);",
+            "  console.log('auditoriaId1 =', res.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"acao\": \"CREATE\",\n  \"entidade\": \"Tcc\",\n  \"entidadeId\": {{tccId1}},\n  \"data\": \"2025-02-01T09:00:00\",\n  \"usuarioId\": {{usuarioId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auditorias/create", "host": ["{{baseUrl}}"], "path": ["api","auditorias","create"] }
+          }
+        },
+        {
+          "name": "Criar Auditoria - Atualização de Submissão",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"acao\": \"UPDATE\",\n  \"entidade\": \"Submissao\",\n  \"entidadeId\": {{submissaoId1}},\n  \"data\": \"2025-04-10T16:05:00\",\n  \"usuarioId\": {{usuarioId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auditorias/create", "host": ["{{baseUrl}}"], "path": ["api","auditorias","create"] }
+          }
+        },
+        {
+          "name": "Criar Auditoria - Login do Coordenador",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"acao\": \"LOGIN\",\n  \"entidade\": \"Usuario\",\n  \"entidadeId\": {{usuarioId1}},\n  \"data\": \"2025-04-28T08:30:00\",\n  \"usuarioId\": {{usuarioId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auditorias/create", "host": ["{{baseUrl}}"], "path": ["api","auditorias","create"] }
+          }
+        },
+        {
+          "name": "[FUTURO] GET Listar Todas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/auditorias", "host": ["{{baseUrl}}"], "path": ["api","auditorias"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] GET Por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/auditorias/{{auditoriaId1}}", "host": ["{{baseUrl}}"], "path": ["api","auditorias","{{auditoriaId1}}"] },
+            "description": "Endpoint ainda não implementado no backend."
+          }
+        },
+        {
+          "name": "[FUTURO] PUT Atualizar Auditoria",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"acao\": \"CREATE\",\n  \"entidade\": \"Tcc\",\n  \"entidadeId\": {{tccId1}},\n  \"data\": \"2025-02-01T09:00:00\",\n  \"usuarioId\": {{usuarioId1}}\n}" },
+            "url": { "raw": "{{baseUrl}}/api/auditorias/{{auditoriaId1}}", "host": ["{{baseUrl}}"], "path": ["api","auditorias","{{auditoriaId1}}"] },
+            "description": "Endpoint ainda não implementado no backend. Auditorias geralmente são imutáveis na prática."
+          }
+        },
+        {
+          "name": "DELETE Auditoria por ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/auditorias/{{auditoriaId1}}", "host": ["{{baseUrl}}"], "path": ["api","auditorias","{{auditoriaId1}}"] }
+          }
+        }
+      ]
+    }
+
+  ]
+}
