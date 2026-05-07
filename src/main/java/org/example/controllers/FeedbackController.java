@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/feedbacks")
 @RequiredArgsConstructor
@@ -21,6 +23,26 @@ public class FeedbackController {
     public ResponseEntity<FeedbackResponseDTO> createFeedback(@Valid @RequestBody FeedbackRequestDTO request) {
         FeedbackResponseDTO response = feedBackService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // Listar feedbacks
+    @GetMapping
+    public ResponseEntity<List<FeedbackResponseDTO>> listAll() {
+
+        List<FeedbackResponseDTO> response = feedBackService.findAll();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Atualizar feedback
+    @PutMapping("/{id}")
+    public ResponseEntity<FeedbackResponseDTO> updateFeedback(
+            @PathVariable Long id,
+            @Valid @RequestBody FeedbackRequestDTO request) {
+
+        FeedbackResponseDTO response = feedBackService.update(id, request);
+
+        return ResponseEntity.ok(response);
     }
 
     // Deletar Feedback

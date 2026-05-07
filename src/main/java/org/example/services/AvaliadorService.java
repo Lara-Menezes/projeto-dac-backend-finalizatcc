@@ -11,6 +11,8 @@ import org.example.repositories.BancaRepository;
 import org.example.repositories.ProfessorRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AvaliadorService {
@@ -30,6 +32,47 @@ public class AvaliadorService {
                 .banca(banca)
                 .professor(professor)
                 .build();
+
+        avaliador = avaliadorRepository.save(avaliador);
+
+        return new AvaliadorResponseDTO(
+                avaliador.getId(),
+                avaliador.getPapel(),
+                avaliador.getBanca().getId(),
+                avaliador.getProfessor().getId()
+        );
+    }
+
+    // Listar
+    public List<AvaliadorResponseDTO> findAll() {
+
+        List<Avaliador> avaliadores = avaliadorRepository.findAll();
+
+        return avaliadores.stream()
+                .map(avaliador -> new AvaliadorResponseDTO(
+                        avaliador.getId(),
+                        avaliador.getPapel(),
+                        avaliador.getBanca().getId(),
+                        avaliador.getProfessor().getId()
+                ))
+                .toList();
+    }
+
+    // Atualizar
+    public AvaliadorResponseDTO update(Long id, AvaliadorRequestDTO request) {
+
+        Avaliador avaliador = avaliadorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Avaliador não encontrado"));
+
+        Banca banca = bancaRepository.findById(request.getBancaId())
+                .orElseThrow(() -> new RuntimeException("Banca não encontrada"));
+
+        Professor professor = professorRepository.findById(request.getProfessorId())
+                .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+
+        avaliador.setPapel(request.getPapel());
+        avaliador.setBanca(banca);
+        avaliador.setProfessor(professor);
 
         avaliador = avaliadorRepository.save(avaliador);
 

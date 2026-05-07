@@ -10,6 +10,7 @@ import org.example.repositories.TccRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,56 @@ public class SubmissaoService {
                 .prazoEntrega(request.getPrazoEntrega())
                 .tcc(tcc)
                 .build();
+
+        submissao = submissaoRepository.save(submissao);
+
+        return new SubmissaoResponseDTO(
+                submissao.getId(),
+                submissao.getVersao(),
+                submissao.getDataEnvio(),
+                submissao.getStatus(),
+                submissao.getPrazoEntrega(),
+                submissao.getTcc().getId()
+        );
+    }
+
+    // Listar
+    public List<SubmissaoResponseDTO> findAll() {
+
+        List<Submissao> submissoes = submissaoRepository.findAll();
+
+        return submissoes.stream()
+                .map(submissao -> new SubmissaoResponseDTO(
+                        submissao.getId(),
+                        submissao.getVersao(),
+                        submissao.getDataEnvio(),
+                        submissao.getStatus(),
+                        submissao.getPrazoEntrega(),
+                        submissao.getTcc().getId()
+                ))
+                .toList();
+    }
+
+    // Atualizar
+    public SubmissaoResponseDTO update(Long id, SubmissaoRequestDTO request) {
+
+        Submissao submissao = submissaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Submissão não encontrada"));
+
+        Tcc tcc = tccRepository.findById(request.getTccId())
+                .orElseThrow(() -> new RuntimeException("TCC não encontrado"));
+
+        submissao.setVersao(request.getVersao());
+        submissao.setStatus(request.getStatus());
+        submissao.setPrazoEntrega(request.getPrazoEntrega());
+        submissao.setTcc(tcc);
+
+        // Mantém data atual se vier null
+        submissao.setDataEnvio(
+                request.getDataEnvio() != null
+                        ? request.getDataEnvio()
+                        : submissao.getDataEnvio()
+        );
 
         submissao = submissaoRepository.save(submissao);
 

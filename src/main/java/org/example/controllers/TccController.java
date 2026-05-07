@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/tccs")
 @RequiredArgsConstructor
@@ -21,6 +23,26 @@ public class TccController {
     public ResponseEntity<TccResponseDTO> createTcc(@Valid @RequestBody TccRequestDTO request) {
         TccResponseDTO response = tccService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // Listar TCCs
+    @GetMapping
+    public ResponseEntity<List<TccResponseDTO>> listAll() {
+
+        List<TccResponseDTO> response = tccService.findAll();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Atualizar TCC
+    @PutMapping("/{id}")
+    public ResponseEntity<TccResponseDTO> updateTcc(
+            @PathVariable Long id,
+            @Valid @RequestBody TccRequestDTO request) {
+
+        TccResponseDTO response = tccService.update(id, request);
+
+        return ResponseEntity.ok(response);
     }
 
     // Deletar TCC

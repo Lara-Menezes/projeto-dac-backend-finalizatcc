@@ -2,6 +2,7 @@ package org.example.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import java.util.List;
 import org.example.dto.request.AlunoRequestDTO;
 import org.example.dto.response.AlunoResponseDTO;
 import org.example.services.AlunoService;
@@ -21,6 +22,26 @@ public class AlunoController {
     public ResponseEntity<AlunoResponseDTO> createAluno(@Valid @RequestBody(required = true) AlunoRequestDTO request) {
         AlunoResponseDTO response = alunoService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // Listar Alunos
+    @GetMapping
+    public ResponseEntity<List<AlunoResponseDTO>> listAll() {
+
+        List<AlunoResponseDTO> response = alunoService.findAll();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Atualizar Aluno
+    @PutMapping("/{id}")
+    public ResponseEntity<AlunoResponseDTO> updateAluno(
+            @PathVariable Long id,
+            @Valid @RequestBody AlunoRequestDTO request) {
+
+        AlunoResponseDTO response = alunoService.update(id, request);
+
+        return ResponseEntity.ok(response);
     }
 
     // Deletar Aluno

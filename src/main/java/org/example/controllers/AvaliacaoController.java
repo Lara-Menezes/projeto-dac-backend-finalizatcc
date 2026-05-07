@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/avaliacoes")
 @RequiredArgsConstructor
@@ -21,6 +23,26 @@ public class AvaliacaoController {
     public ResponseEntity<AvaliacaoResponseDTO> createAvaliacao(@Valid @RequestBody AvaliacaoRequestDTO request) {
         AvaliacaoResponseDTO response = avaliacaoService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // Listar todas as avaliações
+    @GetMapping
+    public ResponseEntity<List<AvaliacaoResponseDTO>> listAll() {
+
+        List<AvaliacaoResponseDTO> response = avaliacaoService.findAll();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Atualizar avaliação
+    @PutMapping("/{id}")
+    public ResponseEntity<AvaliacaoResponseDTO> updateAvaliacao(
+            @PathVariable Long id,
+            @Valid @RequestBody AvaliacaoRequestDTO request) {
+
+        AvaliacaoResponseDTO response = avaliacaoService.update(id, request);
+
+        return ResponseEntity.ok(response);
     }
 
     // Deletar Avaliação

@@ -53,6 +53,57 @@ public class ProfessorService {
         );
     }
 
+    // Listar
+    public List<ProfessorResponseDTO> findAll() {
+
+        List<Professor> professores = professorRepository.findAll();
+
+        return professores.stream()
+                .map(professor -> new ProfessorResponseDTO(
+                        professor.getId(),
+                        professor.getUsuario().getNome(),
+                        professor.getUsuario().getEmail(),
+                        professor.getAreaAtuacao(),
+                        professor.getTitulacao()
+                ))
+                .toList();
+    }
+
+    // Atualizar
+    public ProfessorResponseDTO update(Long id, ProfessorRequestDTO request) {
+
+        Professor professor = professorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+
+        Usuario usuario = professor.getUsuario();
+
+        // Atualizar Usuario
+        usuario.setNome(request.getNome());
+        usuario.setEmail(request.getEmail());
+
+        // Atualiza senha apenas se enviada
+        if (request.getSenha() != null && !request.getSenha().isBlank()) {
+            usuario.setSenha(request.getSenha());
+        }
+
+        usuarioRepository.save(usuario);
+
+        // Atualizar Professor
+        professor.setAreaAtuacao(request.getAreaAtuacao());
+        professor.setTitulacao(request.getTitulacao());
+
+        professor = professorRepository.save(professor);
+
+        return new ProfessorResponseDTO(
+                professor.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                professor.getAreaAtuacao(),
+                professor.getTitulacao()
+        );
+    }
+
+
     // Excluir (Delete) com cascata
     public void deleteById(Long id) {
         // Buscar Tccs onde o professor é orientador ou coorientador

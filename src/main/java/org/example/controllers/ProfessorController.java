@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/professores")
 @RequiredArgsConstructor
@@ -21,6 +23,26 @@ public class ProfessorController {
     public ResponseEntity<ProfessorResponseDTO> createProfessor(@Valid @RequestBody(required = true) ProfessorRequestDTO request) {
         ProfessorResponseDTO response = professorService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // Listar professores
+    @GetMapping
+    public ResponseEntity<List<ProfessorResponseDTO>> listAll() {
+
+        List<ProfessorResponseDTO> response = professorService.findAll();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Atualizar professor
+    @PutMapping("/{id}")
+    public ResponseEntity<ProfessorResponseDTO> updateProfessor(
+            @PathVariable Long id,
+            @Valid @RequestBody ProfessorRequestDTO request) {
+
+        ProfessorResponseDTO response = professorService.update(id, request);
+
+        return ResponseEntity.ok(response);
     }
 
     // Deletar Professor

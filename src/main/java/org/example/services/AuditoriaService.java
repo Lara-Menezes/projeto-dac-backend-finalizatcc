@@ -1,6 +1,7 @@
 package org.example.services;
 
 import lombok.RequiredArgsConstructor;
+import java.util.List;
 import org.example.dto.request.AuditoriaRequestDTO;
 import org.example.dto.response.AuditoriaResponseDTO;
 import org.example.model.Auditoria;
@@ -29,6 +30,56 @@ public class AuditoriaService {
                 .data(request.getData() != null ? request.getData() : LocalDateTime.now())
                 .usuario(usuario)
                 .build();
+
+        auditoria = auditoriaRepository.save(auditoria);
+
+        return new AuditoriaResponseDTO(
+                auditoria.getId(),
+                auditoria.getAcao(),
+                auditoria.getEntidade(),
+                auditoria.getEntidadeId(),
+                auditoria.getData(),
+                auditoria.getUsuario().getId()
+        );
+    }
+
+    // Listar
+    public List<AuditoriaResponseDTO> findAll() {
+
+        List<Auditoria> auditorias = auditoriaRepository.findAll();
+
+        return auditorias.stream()
+                .map(auditoria -> new AuditoriaResponseDTO(
+                        auditoria.getId(),
+                        auditoria.getAcao(),
+                        auditoria.getEntidade(),
+                        auditoria.getEntidadeId(),
+                        auditoria.getData(),
+                        auditoria.getUsuario().getId()
+                ))
+                .toList();
+    }
+
+    // Atualizar
+    public AuditoriaResponseDTO update(Long id, AuditoriaRequestDTO request) {
+
+        Auditoria auditoria = auditoriaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Auditoria não encontrada"));
+
+        Usuario usuario = usuarioRepository.findById(request.getUsuarioId())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        auditoria.setAcao(request.getAcao());
+        auditoria.setEntidade(request.getEntidade());
+        auditoria.setEntidadeId(request.getEntidadeId());
+        auditoria.setUsuario(usuario);
+
+        // Mantém data atual se vier null
+        auditoria.setData(
+                request.getData() != null
+                        ? request.getData()
+                        : auditoria.getData()
+        );
 
         auditoria = auditoriaRepository.save(auditoria);
 

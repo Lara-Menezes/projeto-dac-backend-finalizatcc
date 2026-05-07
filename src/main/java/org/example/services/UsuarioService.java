@@ -54,6 +54,58 @@ public class UsuarioService {
         );
     }
 
+    // Listar
+    public List<UsuarioResponseDTO> findAll() {
+
+        List<Usuario> usuarios = usuarioRepository.findAll();
+
+        return usuarios.stream()
+                .map(usuario -> new UsuarioResponseDTO(
+                        usuario.getId(),
+                        usuario.getNome(),
+                        usuario.getEmail(),
+                        usuario.getTipo(),
+                        usuario.getAtivo(),
+                        usuario.getCreatedAt()
+                ))
+                .toList();
+    }
+
+    // Atualizar
+    public UsuarioResponseDTO update(Long id, UsuarioRequestDTO request) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado"));
+
+        usuario.setNome(request.getNome());
+        usuario.setEmail(request.getEmail());
+
+        // Atualiza senha apenas se enviada
+        if (request.getSenha() != null && !request.getSenha().isBlank()) {
+            usuario.setSenha(request.getSenha());
+        }
+
+        usuario.setTipo(request.getTipo());
+
+        usuario.setAtivo(
+                request.getAtivo() != null
+                        ? request.getAtivo()
+                        : usuario.getAtivo()
+        );
+
+        usuario = usuarioRepository.save(usuario);
+
+        return new UsuarioResponseDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getTipo(),
+                usuario.getAtivo(),
+                usuario.getCreatedAt()
+        );
+    }
+
     public void deleteById(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));

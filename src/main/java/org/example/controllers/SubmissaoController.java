@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/submissoes")
 @RequiredArgsConstructor
@@ -21,6 +23,26 @@ public class SubmissaoController {
     public ResponseEntity<SubmissaoResponseDTO> createSubmissao(@Valid @RequestBody SubmissaoRequestDTO request) {
         SubmissaoResponseDTO response = submissaoService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // Listar submissões
+    @GetMapping
+    public ResponseEntity<List<SubmissaoResponseDTO>> listAll() {
+
+        List<SubmissaoResponseDTO> response = submissaoService.findAll();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Atualizar submissão
+    @PutMapping("/{id}")
+    public ResponseEntity<SubmissaoResponseDTO> updateSubmissao(
+            @PathVariable Long id,
+            @Valid @RequestBody SubmissaoRequestDTO request) {
+
+        SubmissaoResponseDTO response = submissaoService.update(id, request);
+
+        return ResponseEntity.ok(response);
     }
 
     // Deletar Submissão

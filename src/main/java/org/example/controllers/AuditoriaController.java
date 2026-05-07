@@ -2,6 +2,7 @@ package org.example.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import java.util.List;
 import org.example.dto.request.AuditoriaRequestDTO;
 import org.example.dto.response.AuditoriaResponseDTO;
 import org.example.services.AuditoriaService;
@@ -21,6 +22,26 @@ public class AuditoriaController {
     public ResponseEntity<AuditoriaResponseDTO> createAuditoria(@Valid @RequestBody AuditoriaRequestDTO request) {
         AuditoriaResponseDTO response = auditoriaService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // Listar Auditorias
+    @GetMapping
+    public ResponseEntity<List<AuditoriaResponseDTO>> listAll() {
+
+        List<AuditoriaResponseDTO> response = auditoriaService.findAll();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Atualizar Auditoria
+    @PutMapping("/{id}")
+    public ResponseEntity<AuditoriaResponseDTO> updateAuditoria(
+            @PathVariable Long id,
+            @Valid @RequestBody AuditoriaRequestDTO request) {
+
+        AuditoriaResponseDTO response = auditoriaService.update(id, request);
+
+        return ResponseEntity.ok(response);
     }
 
     // Deletar Auditoria

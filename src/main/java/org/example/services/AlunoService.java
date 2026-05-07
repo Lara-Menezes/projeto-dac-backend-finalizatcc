@@ -53,6 +53,59 @@ public class AlunoService {
         );
     }
 
+    // Listar todos
+    public List<AlunoResponseDTO> findAll() {
+
+        List<Aluno> alunos = alunoRepository.findAll();
+
+        return alunos.stream()
+                .map(aluno -> new AlunoResponseDTO(
+                        aluno.getId(),
+                        aluno.getUsuario().getNome(),
+                        aluno.getUsuario().getEmail(),
+                        aluno.getMatricula(),
+                        aluno.getCurso(),
+                        aluno.getPeriodo()
+                ))
+                .toList();
+    }
+
+    // Atualizar
+    public AlunoResponseDTO update(Long id, AlunoRequestDTO request) {
+
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+        Usuario usuario = aluno.getUsuario();
+
+        // Atualizar Usuario
+        usuario.setNome(request.getNome());
+        usuario.setEmail(request.getEmail());
+
+        // Atualizar senha apenas se enviada
+        if (request.getSenha() != null && !request.getSenha().isBlank()) {
+            usuario.setSenha(request.getSenha());
+        }
+
+        usuarioRepository.save(usuario);
+
+        // Atualizar Aluno
+        aluno.setMatricula(request.getMatricula());
+        aluno.setCurso(request.getCurso());
+        aluno.setPeriodo(request.getPeriodo());
+
+        aluno = alunoRepository.save(aluno);
+
+        return new AlunoResponseDTO(
+                aluno.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                aluno.getMatricula(),
+                aluno.getCurso(),
+                aluno.getPeriodo()
+        );
+    }
+
     // Excluir (Delete) com cascata
     public void deleteById(Long id) {
         // Buscar Tccs do aluno

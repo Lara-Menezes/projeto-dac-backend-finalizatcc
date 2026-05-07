@@ -25,6 +25,27 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    // Listar usuários
+    @GetMapping
+    public ResponseEntity<List<UsuarioResponseDTO>> listAll() {
+
+        List<UsuarioResponseDTO> response = usuarioService.findAll();
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Atualizar usuário
+    @PutMapping("/{id}")
+    public ResponseEntity<UsuarioResponseDTO> updateUsuario(
+            @PathVariable Long id,
+            @Valid @RequestBody UsuarioRequestDTO request) {
+
+        UsuarioResponseDTO response = usuarioService.update(id, request);
+
+        return ResponseEntity.ok(response);
+    }
+
+
     // Deletar Usuário
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {

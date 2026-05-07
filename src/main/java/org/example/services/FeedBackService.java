@@ -12,6 +12,7 @@ import org.example.repositories.SubmissaoRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +35,59 @@ public class FeedBackService {
                 .submissao(submissao)
                 .professor(professor)
                 .build();
+
+        feedback = feedbackRepository.save(feedback);
+
+        return new FeedbackResponseDTO(
+                feedback.getId(),
+                feedback.getComentario(),
+                feedback.getNota(),
+                feedback.getData(),
+                feedback.getSubmissao().getId(),
+                feedback.getProfessor().getId()
+        );
+    }
+
+    // Listar
+    public List<FeedbackResponseDTO> findAll() {
+
+        List<Feedback> feedbacks = feedbackRepository.findAll();
+
+        return feedbacks.stream()
+                .map(feedback -> new FeedbackResponseDTO(
+                        feedback.getId(),
+                        feedback.getComentario(),
+                        feedback.getNota(),
+                        feedback.getData(),
+                        feedback.getSubmissao().getId(),
+                        feedback.getProfessor().getId()
+                ))
+                .toList();
+    }
+
+    // Atualizar
+    public FeedbackResponseDTO update(Long id, FeedbackRequestDTO request) {
+
+        Feedback feedback = feedbackRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Feedback não encontrado"));
+
+        Submissao submissao = submissaoRepository.findById(request.getSubmissaoId())
+                .orElseThrow(() -> new RuntimeException("Submissão não encontrada"));
+
+        Professor professor = professorRepository.findById(request.getProfessorId())
+                .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+
+        feedback.setComentario(request.getComentario());
+        feedback.setNota(request.getNota());
+        feedback.setSubmissao(submissao);
+        feedback.setProfessor(professor);
+
+        // Mantém data atual se vier null
+        feedback.setData(
+                request.getData() != null
+                        ? request.getData()
+                        : feedback.getData()
+        );
 
         feedback = feedbackRepository.save(feedback);
 
