@@ -60,6 +60,23 @@ public class AuditoriaService {
                 .toList();
     }
 
+    // Buscar por ID
+    public AuditoriaResponseDTO findById(Long id) {
+
+        Auditoria auditoria = auditoriaRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Auditoria não encontrada"));
+
+        return new AuditoriaResponseDTO(
+                auditoria.getId(),
+                auditoria.getAcao(),
+                auditoria.getEntidade(),
+                auditoria.getEntidadeId(),
+                auditoria.getData(),
+                auditoria.getUsuario().getId()
+        );
+    }
+
     // Atualizar
     public AuditoriaResponseDTO update(Long id, AuditoriaRequestDTO request) {
 

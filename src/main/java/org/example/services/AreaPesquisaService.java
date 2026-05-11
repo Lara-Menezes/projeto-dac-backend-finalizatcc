@@ -42,6 +42,19 @@ public class AreaPesquisaService{
                 .toList();
     }
 
+    // Buscar por ID
+    public AreaPesquisaResponseDTO findById(Long id) {
+
+        AreaPesquisa areaPesquisa = areaPesquisaRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Área de pesquisa não encontrada"));
+
+        return new AreaPesquisaResponseDTO(
+                areaPesquisa.getId(),
+                areaPesquisa.getNome()
+        );
+    }
+
     // Atualizar
     public AreaPesquisaResponseDTO update(Long id, AreaPesquisaRequestDTO request) {
 

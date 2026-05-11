@@ -34,6 +34,15 @@ public class AvaliacaoController {
         return ResponseEntity.ok(response);
     }
 
+    // Buscar avaliação por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<AvaliacaoResponseDTO> findById(@PathVariable Long id) {
+
+        AvaliacaoResponseDTO response = avaliacaoService.findById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
     // Atualizar avaliação
     @PutMapping("/{id}")
     public ResponseEntity<AvaliacaoResponseDTO> updateAvaliacao(

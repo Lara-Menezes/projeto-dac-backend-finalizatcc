@@ -33,6 +33,15 @@ public class AlunoController {
         return ResponseEntity.ok(response);
     }
 
+    // Buscar aluno por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<AlunoResponseDTO> findById(@PathVariable Long id) {
+
+        AlunoResponseDTO response = alunoService.findById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
     // Atualizar Aluno
     @PutMapping("/{id}")
     public ResponseEntity<AlunoResponseDTO> updateAluno(

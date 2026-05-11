@@ -33,6 +33,15 @@ public class AreaPesquisaController {
         return ResponseEntity.ok(response);
     }
 
+    // Buscar área de pesquisa por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<AreaPesquisaResponseDTO> findById(@PathVariable Long id) {
+
+        AreaPesquisaResponseDTO response = areaPesquisaService.findById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
     // Atualizar Área de Pesquisa
     @PutMapping("/{id}")
     public ResponseEntity<AreaPesquisaResponseDTO> updateAreaPesquisa(

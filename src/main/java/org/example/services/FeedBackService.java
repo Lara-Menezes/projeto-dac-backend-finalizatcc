@@ -65,6 +65,23 @@ public class FeedBackService {
                 .toList();
     }
 
+    // Buscar por ID
+    public FeedbackResponseDTO findById(Long id) {
+
+        Feedback feedback = feedbackRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Feedback não encontrado"));
+
+        return new FeedbackResponseDTO(
+                feedback.getId(),
+                feedback.getComentario(),
+                feedback.getNota(),
+                feedback.getData(),
+                feedback.getSubmissao().getId(),
+                feedback.getProfessor().getId()
+        );
+    }
+
     // Atualizar
     public FeedbackResponseDTO update(Long id, FeedbackRequestDTO request) {
 

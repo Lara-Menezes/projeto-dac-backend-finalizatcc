@@ -56,6 +56,22 @@ public class BancaService {
                 .toList();
     }
 
+    // Buscar por ID
+    public BancaResponseDTO findById(Long id) {
+
+        Banca banca = bancaRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Banca não encontrada"));
+
+        return new BancaResponseDTO(
+                banca.getId(),
+                banca.getData(),
+                banca.getLocal(),
+                banca.getNotaFinal(),
+                banca.getTcc().getId()
+        );
+    }
+
     // Atualizar
     public BancaResponseDTO update(Long id, BancaRequestDTO request) {
 

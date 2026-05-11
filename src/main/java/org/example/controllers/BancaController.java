@@ -34,6 +34,15 @@ public class BancaController {
         return ResponseEntity.ok(response);
     }
 
+    // Buscar banca por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<BancaResponseDTO> findById(@PathVariable Long id) {
+
+        BancaResponseDTO response = bancaService.findById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
     // Atualizar banca
     @PutMapping("/{id}")
     public ResponseEntity<BancaResponseDTO> updateBanca(

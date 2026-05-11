@@ -34,6 +34,15 @@ public class SubmissaoController {
         return ResponseEntity.ok(response);
     }
 
+    // Buscar submissão por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<SubmissaoResponseDTO> findById(@PathVariable Long id) {
+
+        SubmissaoResponseDTO response = submissaoService.findById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
     // Atualizar submissão
     @PutMapping("/{id}")
     public ResponseEntity<SubmissaoResponseDTO> updateSubmissao(

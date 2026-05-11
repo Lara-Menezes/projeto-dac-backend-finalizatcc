@@ -34,6 +34,15 @@ public class TccController {
         return ResponseEntity.ok(response);
     }
 
+    // Buscar TCC por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<TccResponseDTO> findById(@PathVariable Long id) {
+
+        TccResponseDTO response = tccService.findById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
     // Atualizar TCC
     @PutMapping("/{id}")
     public ResponseEntity<TccResponseDTO> updateTcc(

@@ -53,6 +53,21 @@ public class AvaliacaoService {
                 .toList();
     }
 
+    // Buscar por ID
+    public AvaliacaoResponseDTO findById(Long id) {
+
+        Avaliacao avaliacao = avaliacaoRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Avaliação não encontrada"));
+
+        return new AvaliacaoResponseDTO(
+                avaliacao.getId(),
+                avaliacao.getNota(),
+                avaliacao.getComentario(),
+                avaliacao.getAvaliador().getId()
+        );
+    }
+
     // Atualizar
     public AvaliacaoResponseDTO update(Long id, AvaliacaoRequestDTO request) {
 

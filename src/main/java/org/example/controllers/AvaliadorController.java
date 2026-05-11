@@ -34,6 +34,15 @@ public class AvaliadorController {
         return ResponseEntity.ok(response);
     }
 
+    // Buscar avaliador por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<AvaliadorResponseDTO> findById(@PathVariable Long id) {
+
+        AvaliadorResponseDTO response = avaliadorService.findById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
     // Atualizar avaliador
     @PutMapping("/{id}")
     public ResponseEntity<AvaliadorResponseDTO> updateAvaliador(

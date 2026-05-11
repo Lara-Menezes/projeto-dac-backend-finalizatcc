@@ -93,6 +93,31 @@ public class TccService {
                 .toList();
     }
 
+    // Buscar por ID
+    public TccResponseDTO findById(Long id) {
+
+        Tcc tcc = tccRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("TCC não encontrado"));
+
+        return new TccResponseDTO(
+                tcc.getId(),
+                tcc.getTitulo(),
+                tcc.getResumo(),
+                tcc.getArea() != null
+                        ? tcc.getArea().getId()
+                        : null,
+                tcc.getAluno().getId(),
+                tcc.getOrientador().getId(),
+                tcc.getCoorientador() != null
+                        ? tcc.getCoorientador().getId()
+                        : null,
+                tcc.getStatus(),
+                tcc.getDataInicio(),
+                tcc.getDataFim()
+        );
+    }
+
     // Atualizar
     public TccResponseDTO update(Long id, TccRequestDTO request) {
 

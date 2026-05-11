@@ -69,6 +69,22 @@ public class ProfessorService {
                 .toList();
     }
 
+    // Buscar por ID
+    public ProfessorResponseDTO findById(Long id) {
+
+        Professor professor = professorRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Professor não encontrado"));
+
+        return new ProfessorResponseDTO(
+                professor.getId(),
+                professor.getUsuario().getNome(),
+                professor.getUsuario().getEmail(),
+                professor.getAreaAtuacao(),
+                professor.getTitulacao()
+        );
+    }
+
     // Atualizar
     public ProfessorResponseDTO update(Long id, ProfessorRequestDTO request) {
 

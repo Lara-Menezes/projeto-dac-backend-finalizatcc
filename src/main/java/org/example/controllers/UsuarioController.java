@@ -34,6 +34,15 @@ public class UsuarioController {
         return ResponseEntity.ok(response);
     }
 
+    // Buscar usuário por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioResponseDTO> findById(@PathVariable Long id) {
+
+        UsuarioResponseDTO response = usuarioService.findById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
     // Atualizar usuário
     @PutMapping("/{id}")
     public ResponseEntity<UsuarioResponseDTO> updateUsuario(

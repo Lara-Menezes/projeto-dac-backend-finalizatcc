@@ -71,6 +71,23 @@ public class UsuarioService {
                 .toList();
     }
 
+    // Buscar por ID
+    public UsuarioResponseDTO findById(Long id) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado"));
+
+        return new UsuarioResponseDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getTipo(),
+                usuario.getAtivo(),
+                usuario.getCreatedAt()
+        );
+    }
+
     // Atualizar
     public UsuarioResponseDTO update(Long id, UsuarioRequestDTO request) {
 

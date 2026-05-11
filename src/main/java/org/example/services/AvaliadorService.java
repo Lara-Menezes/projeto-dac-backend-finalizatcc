@@ -58,6 +58,21 @@ public class AvaliadorService {
                 .toList();
     }
 
+    // Buscar por ID
+    public AvaliadorResponseDTO findById(Long id) {
+
+        Avaliador avaliador = avaliadorRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Avaliador não encontrado"));
+
+        return new AvaliadorResponseDTO(
+                avaliador.getId(),
+                avaliador.getPapel(),
+                avaliador.getBanca().getId(),
+                avaliador.getProfessor().getId()
+        );
+    }
+
     // Atualizar
     public AvaliadorResponseDTO update(Long id, AvaliadorRequestDTO request) {
 

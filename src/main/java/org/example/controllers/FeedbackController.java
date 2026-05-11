@@ -34,6 +34,15 @@ public class FeedbackController {
         return ResponseEntity.ok(response);
     }
 
+    // Buscar feedback por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<FeedbackResponseDTO> findById(@PathVariable Long id) {
+
+        FeedbackResponseDTO response = feedBackService.findById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
     // Atualizar feedback
     @PutMapping("/{id}")
     public ResponseEntity<FeedbackResponseDTO> updateFeedback(

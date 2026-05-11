@@ -33,6 +33,15 @@ public class AuditoriaController {
         return ResponseEntity.ok(response);
     }
 
+    // Buscar auditoria por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<AuditoriaResponseDTO> findById(@PathVariable Long id) {
+
+        AuditoriaResponseDTO response = auditoriaService.findById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
     // Atualizar Auditoria
     @PutMapping("/{id}")
     public ResponseEntity<AuditoriaResponseDTO> updateAuditoria(

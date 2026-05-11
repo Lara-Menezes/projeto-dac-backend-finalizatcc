@@ -70,6 +70,23 @@ public class AlunoService {
                 .toList();
     }
 
+    // Buscar por ID
+    public AlunoResponseDTO findById(Long id) {
+
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Aluno não encontrado"));
+
+        return new AlunoResponseDTO(
+                aluno.getId(),
+                aluno.getUsuario().getNome(),
+                aluno.getUsuario().getEmail(),
+                aluno.getMatricula(),
+                aluno.getCurso(),
+                aluno.getPeriodo()
+        );
+    }
+
     // Atualizar
     public AlunoResponseDTO update(Long id, AlunoRequestDTO request) {
 

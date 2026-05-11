@@ -69,6 +69,26 @@ public class ArquivoService {
                 .toList();
     }
 
+    // Buscar por ID
+    public ArquivoResponseDTO findById(Long id) {
+
+        Arquivo arquivo = arquivoRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Arquivo não encontrado"));
+
+        return new ArquivoResponseDTO(
+                arquivo.getId(),
+                arquivo.getNomeArquivo(),
+                arquivo.getCaminho(),
+                arquivo.getTipo(),
+                arquivo.getMimeType(),
+                arquivo.getTamanho(),
+                arquivo.getHashArquivo(),
+                arquivo.getDataUpload(),
+                arquivo.getSubmissao().getId()
+        );
+    }
+
     // Atualizar
     public ArquivoResponseDTO update(Long id, ArquivoRequestDTO request) {
 

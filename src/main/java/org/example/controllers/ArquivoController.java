@@ -33,6 +33,15 @@ public class ArquivoController {
         return ResponseEntity.ok(response);
     }
 
+    // Buscar arquivo por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<ArquivoResponseDTO> findById(@PathVariable Long id) {
+
+        ArquivoResponseDTO response = arquivoService.findById(id);
+
+        return ResponseEntity.ok(response);
+    }
+
     // Atualizar Arquivo
     @PutMapping("/{id}")
     public ResponseEntity<ArquivoResponseDTO> updateArquivo(

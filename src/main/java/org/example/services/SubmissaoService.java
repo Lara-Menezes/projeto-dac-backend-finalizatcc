@@ -60,6 +60,23 @@ public class SubmissaoService {
                 .toList();
     }
 
+    // Buscar por ID
+    public SubmissaoResponseDTO findById(Long id) {
+
+        Submissao submissao = submissaoRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Submissão não encontrada"));
+
+        return new SubmissaoResponseDTO(
+                submissao.getId(),
+                submissao.getVersao(),
+                submissao.getDataEnvio(),
+                submissao.getStatus(),
+                submissao.getPrazoEntrega(),
+                submissao.getTcc().getId()
+        );
+    }
+
     // Atualizar
     public SubmissaoResponseDTO update(Long id, SubmissaoRequestDTO request) {
 
