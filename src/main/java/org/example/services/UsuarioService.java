@@ -1,5 +1,6 @@
 package org.example.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.UsuarioRequestDTO;
 import org.example.dto.response.UsuarioResponseDTO;
@@ -123,51 +124,63 @@ public class UsuarioService {
         );
     }
 
+    //Deletar
+    @Transactional
     public void deleteById(Long id) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado"));
+
+        boolean possuiVinculo = false;
+
+        // Aluno
         if (usuario.getTipo() == TipoUsuario.ALUNO) {
-            // Lógica de cascata para Aluno
-            List<Tcc> tccs = tccRepository.findByAlunoId(id);
-            for (Tcc tcc : tccs) {
-                Banca banca = bancaRepository.findByTccId(tcc.getId()).orElse(null);
-                if (banca != null) {
-                    List<Avaliador> avaliadoresBanca = avaliadorRepository.findByBancaId(banca.getId());
-                    for (Avaliador av : avaliadoresBanca) {
-                        avaliadorRepository.delete(av);
-                    }
-                    bancaRepository.delete(banca);
-                }
-                tccRepository.delete(tcc);
+
+            possuiVinculo = tccRepository.existsByAlunoId(id);
+
+            if (possuiVinculo) {
+                usuario.setAtivo(false);
+                usuarioRepository.save(usuario);
+
+                return;
             }
             alunoRepository.deleteById(id);
-        } else if (usuario.getTipo() == TipoUsuario.PROFESSOR) {
-            // Lógica de cascata para Professor
-            List<Tcc> tccsOrientador = tccRepository.findByOrientadorId(id);
-            List<Tcc> tccsCoorientador = tccRepository.findByCoorientadorId(id);
-            List<Tcc> tccs = Stream.concat(tccsOrientador.stream(), tccsCoorientador.stream())
-                    .distinct()
-                    .collect(Collectors.toList());
-            for (Tcc tcc : tccs) {
-                Banca banca = bancaRepository.findByTccId(tcc.getId()).orElse(null);
-                if (banca != null) {
-                    List<Avaliador> avaliadoresBanca = avaliadorRepository.findByBancaId(banca.getId());
-                    for (Avaliador av : avaliadoresBanca) {
-                        avaliadorRepository.delete(av);
-                    }
-                    bancaRepository.delete(banca);
-                }
-                tccRepository.delete(tcc);
-            }
-            List<Avaliador> avaliadoresProf = avaliadorRepository.findByProfessorId(id);
-            for (Avaliador av : avaliadoresProf) {
-                avaliadorRepository.delete(av);
+        }
+
+        // Professor
+        else if (usuario.getTipo() == TipoUsuario.PROFESSOR) {
+
+            boolean orientador = tccRepository.existsByOrientadorId(id);
+            boolean coorientador = tccRepository.existsByCoorientadorId(id);
+            boolean avaliador = avaliadorRepository.existsByProfessorId(id);
+
+            possuiVinculo = orientador || coorientador || avaliador;
+
+            if (possuiVinculo) {
+                usuario.setAtivo(false);
+                usuarioRepository.save(usuario);
+
+                return;
             }
             professorRepository.deleteById(id);
         }
-        // Para COORDENADOR, sem cascata adicional
+
+        // Coordenador
+        // sem vínculos históricos por enquanto
 
         usuarioRepository.deleteById(id);
+    }
+
+    // Reativar
+    @Transactional
+    public void reativarUsuario(Long id) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        usuario.setAtivo(true);
+
+        usuarioRepository.save(usuario);
     }
 }

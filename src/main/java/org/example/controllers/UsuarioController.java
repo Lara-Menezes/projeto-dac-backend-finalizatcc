@@ -61,4 +61,12 @@ public class UsuarioController {
         usuarioService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+
+    // Reativa Usuário
+    @PatchMapping("/{id}/reativar")
+    public ResponseEntity<String> reativar(@PathVariable Long id) {
+        usuarioService.reativarUsuario(id);
+        return ResponseEntity.ok("Usuário reativado com sucesso");
+    }
 }

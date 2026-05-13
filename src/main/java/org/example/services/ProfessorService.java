@@ -1,5 +1,6 @@
 package org.example.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.ProfessorRequestDTO;
 import org.example.dto.response.ProfessorResponseDTO;
@@ -119,39 +120,31 @@ public class ProfessorService {
         );
     }
 
-
-    // Excluir (Delete) com cascata
+    @Transactional
     public void deleteById(Long id) {
-        // Buscar Tccs onde o professor é orientador ou coorientador
-        List<Tcc> tccsOrientador = tccRepository.findByOrientadorId(id);
-        List<Tcc> tccsCoorientador = tccRepository.findByCoorientadorId(id);
-        List<Tcc> tccs = Stream.concat(tccsOrientador.stream(), tccsCoorientador.stream())
-                .distinct()
-                .collect(Collectors.toList());
 
-        // Para cada Tcc, deletar dependentes: Avaliadores da Banca, depois Banca, depois Tcc
-        for (Tcc tcc : tccs) {
-            Banca banca = bancaRepository.findByTccId(tcc.getId()).orElse(null);
-            if (banca != null) {
-                List<Avaliador> avaliadoresBanca = avaliadorRepository.findByBancaId(banca.getId());
-                for (Avaliador av : avaliadoresBanca) {
-                    avaliadorRepository.delete(av);
-                }
-                bancaRepository.delete(banca);
-            }
-            tccRepository.delete(tcc);
+        Professor professor = professorRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Professor não encontrado"));
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado"));
+
+        boolean orientador = tccRepository.existsByOrientadorId(id);
+        boolean coorientador = tccRepository.existsByCoorientadorId(id);
+        boolean avaliador = avaliadorRepository.existsByProfessorId(id);
+        boolean possuiVinculo = orientador || coorientador || avaliador;
+
+        // Se possue vinculo desativa
+        if (possuiVinculo) {
+            usuario.setAtivo(false);
+            usuarioRepository.save(usuario);
+
+            return;
         }
-
-        // Deletar Avaliadores diretos do professor
-        List<Avaliador> avaliadoresProf = avaliadorRepository.findByProfessorId(id);
-        for (Avaliador av : avaliadoresProf) {
-            avaliadorRepository.delete(av);
-        }
-
-        // Deletar o Professor
+        // Se não tiver exclui
         professorRepository.deleteById(id);
-
-        // **IMPORTANTE: Deletar o Usuario associado**
         usuarioRepository.deleteById(id);
     }
 }
