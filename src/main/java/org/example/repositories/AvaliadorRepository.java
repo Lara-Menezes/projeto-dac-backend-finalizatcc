@@ -10,4 +10,5 @@ import java.util.List;
 public interface AvaliadorRepository extends JpaRepository<Avaliador, Long> {
     List<Avaliador> findByBancaId(Long bancaId);
     List<Avaliador> findByProfessorId(Long professorId);
+    boolean existsByProfessorId(Long id);
 }

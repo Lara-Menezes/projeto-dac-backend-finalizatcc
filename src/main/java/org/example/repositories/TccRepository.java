@@ -13,4 +13,7 @@ public interface TccRepository extends JpaRepository<Tcc, Long> {
     List<Tcc> findByCoorientadorId(Long coorientadorId);  // Adicione esta linha
     List<Tcc> findByStatus(StatusTcc status);
     Optional<Tcc> findByAreaId(Long areaId);
+    boolean existsByAlunoId(Long id);
+    boolean existsByOrientadorId(Long id);
+    boolean existsByCoorientadorId(Long id);
 }

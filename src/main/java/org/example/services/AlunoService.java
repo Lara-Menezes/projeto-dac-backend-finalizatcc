@@ -1,5 +1,6 @@
 package org.example.services;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.AlunoRequestDTO;
 import org.example.dto.response.AlunoResponseDTO;
@@ -123,28 +124,28 @@ public class AlunoService {
         );
     }
 
-    // Excluir (Delete) com cascata
+    @Transactional
     public void deleteById(Long id) {
-        // Buscar Tccs do aluno
-        List<Tcc> tccs = tccRepository.findByAlunoId(id);
 
-        // Para cada Tcc, deletar dependentes: Avaliadores da Banca, depois Banca, depois Tcc
-        for (Tcc tcc : tccs) {
-            Banca banca = bancaRepository.findByTccId(tcc.getId()).orElse(null);
-            if (banca != null) {
-                List<Avaliador> avaliadoresBanca = avaliadorRepository.findByBancaId(banca.getId());
-                for (Avaliador av : avaliadoresBanca) {
-                    avaliadorRepository.delete(av);
-                }
-                bancaRepository.delete(banca);
-            }
-            tccRepository.delete(tcc);
+        Aluno aluno = alunoRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Aluno não encontrado"));
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado"));
+
+        boolean possuiTcc = tccRepository.existsByAlunoId(id);
+
+        // Se possue vinculo desativa
+        if (possuiTcc) {
+            usuario.setAtivo(false);
+            usuarioRepository.save(usuario);
+
+            return;
         }
-
-        // Deletar o Aluno
+        // Se não tiver exclui
         alunoRepository.deleteById(id);
-
-        // **IMPORTANTE: Deletar o Usuario associado**
         usuarioRepository.deleteById(id);
     }
 }
