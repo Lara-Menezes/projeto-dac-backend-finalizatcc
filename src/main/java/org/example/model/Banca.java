@@ -23,7 +23,7 @@ public class Banca {
 
     private Double notaFinal;
 
-    @ManyToOne
-    @JoinColumn(name = "tcc_id", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "tcc_id", nullable = false, unique = true)
     private Tcc tcc;
 }
