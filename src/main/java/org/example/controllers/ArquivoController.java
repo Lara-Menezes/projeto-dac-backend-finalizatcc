@@ -2,20 +2,21 @@ package org.example.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
-import java.io.IOException;
 import java.util.List;
 import org.example.dto.request.ArquivoRequestDTO;
 import org.example.dto.response.ArquivoResponseDTO;
 import org.example.enums.TipoArquivo;
 import org.example.services.ArquivoService;
+import org.example.services.ArquivoService.ArquivoDownload;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
+
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/arquivos")
@@ -24,44 +25,20 @@ public class ArquivoController {
 
     private final ArquivoService arquivoService;
 
-    // Upload Arquivo
-    @PostMapping(
-            value = "/upload",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
-    )
+    // Criar Arquivo
+    @PostMapping("/create")
+    public ResponseEntity<ArquivoResponseDTO> createArquivo(@Valid @RequestBody ArquivoRequestDTO request) {
+        ArquivoResponseDTO response = arquivoService.save(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ArquivoResponseDTO> uploadArquivo(
             @RequestParam("file") MultipartFile file,
             @RequestParam("submissaoId") Long submissaoId,
-            @RequestParam("tipo") TipoArquivo tipo
-    ) throws IOException {
-
-        ArquivoResponseDTO response =
-                arquivoService.upload(file, submissaoId, tipo);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(response);
-    }
-
-    //Dowload arquivo
-    @GetMapping("/download/{id}")
-    public ResponseEntity<Resource> downloadArquivo(
-            @PathVariable Long id
-    ) throws Exception {
-
-        Resource resource =
-                arquivoService.downloadArquivo(id);
-
-        ArquivoResponseDTO arquivo =
-                arquivoService.findById(id);
-
-        return ResponseEntity.ok()
-                .header(
-                        HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" +
-                                arquivo.getNomeArquivo() +
-                                "\""
-                )
-                .body(resource);
+            @RequestParam(value = "tipo", defaultValue = "MANUSCRITO") TipoArquivo tipo) {
+        ArquivoResponseDTO response = arquivoService.upload(file, submissaoId, tipo);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // Listar Arquivos
@@ -73,6 +50,12 @@ public class ArquivoController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/submissao/{submissaoId}")
+    public ResponseEntity<List<ArquivoResponseDTO>> findBySubmissao(@PathVariable Long submissaoId) {
+        List<ArquivoResponseDTO> response = arquivoService.findBySubmissaoId(submissaoId);
+        return ResponseEntity.ok(response);
+    }
+
     // Buscar arquivo por ID
     @GetMapping("/{id}")
     public ResponseEntity<ArquivoResponseDTO> findById(@PathVariable Long id) {
@@ -80,6 +63,23 @@ public class ArquivoController {
         ArquivoResponseDTO response = arquivoService.findById(id);
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<?> download(@PathVariable Long id) {
+        ArquivoDownload download = arquivoService.download(id);
+        String mimeType = download.mimeType() != null ? download.mimeType() : MediaType.APPLICATION_OCTET_STREAM_VALUE;
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(mimeType))
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment()
+                                .filename(download.nomeArquivo(), StandardCharsets.UTF_8)
+                                .build()
+                                .toString()
+                )
+                .body(download.resource());
     }
 
     // Atualizar Arquivo
