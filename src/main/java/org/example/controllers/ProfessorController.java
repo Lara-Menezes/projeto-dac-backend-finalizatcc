@@ -3,6 +3,7 @@ package org.example.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.ProfessorRequestDTO;
+import org.example.dto.request.ProfessorUpdateRequestDTO;
 import org.example.dto.response.ProfessorResponseDTO;
 import org.example.services.ProfessorService;
 import org.springframework.http.HttpStatus;
@@ -47,7 +48,7 @@ public class ProfessorController {
     @PutMapping("/{id}")
     public ResponseEntity<ProfessorResponseDTO> updateProfessor(
             @PathVariable Long id,
-            @Valid @RequestBody ProfessorRequestDTO request) {
+            @RequestBody ProfessorUpdateRequestDTO request) {
 
         ProfessorResponseDTO response = professorService.update(id, request);
 

@@ -34,6 +34,12 @@ public class SubmissaoController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/tcc/{tccId}")
+    public ResponseEntity<List<SubmissaoResponseDTO>> findByTcc(@PathVariable Long tccId) {
+        List<SubmissaoResponseDTO> response = submissaoService.findByTccId(tccId);
+        return ResponseEntity.ok(response);
+    }
+
     // Buscar submissão por ID
     @GetMapping("/{id}")
     public ResponseEntity<SubmissaoResponseDTO> findById(@PathVariable Long id) {

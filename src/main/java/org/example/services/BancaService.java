@@ -3,8 +3,11 @@ package org.example.services;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.BancaRequestDTO;
 import org.example.dto.response.BancaResponseDTO;
+import org.example.enums.StatusTcc;
+import org.example.model.Avaliador;
 import org.example.model.Banca;
 import org.example.model.Tcc;
+import org.example.repositories.AvaliadorRepository;
 import org.example.repositories.BancaRepository;
 import org.example.repositories.TccRepository;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ public class BancaService {
 
     private final BancaRepository bancaRepository;
     private final TccRepository tccRepository;
+    private final AvaliadorRepository avaliadorRepository;
 
     public BancaResponseDTO save(BancaRequestDTO request) {
         Tcc tcc = tccRepository.findById(request.getTccId())
@@ -29,15 +33,8 @@ public class BancaService {
                 .tcc(tcc)
                 .build();
 
-        banca = bancaRepository.save(banca);
-
-        return new BancaResponseDTO(
-                banca.getId(),
-                banca.getData(),
-                banca.getLocal(),
-                banca.getNotaFinal(),
-                banca.getTcc().getId()
-        );
+        updateTccStatusFromBanca(tcc, request.getNotaFinal());
+        return toResponse(bancaRepository.save(banca));
     }
 
     // Listar
@@ -46,14 +43,15 @@ public class BancaService {
         List<Banca> bancas = bancaRepository.findAll();
 
         return bancas.stream()
-                .map(banca -> new BancaResponseDTO(
-                        banca.getId(),
-                        banca.getData(),
-                        banca.getLocal(),
-                        banca.getNotaFinal(),
-                        banca.getTcc().getId()
-                ))
+                .map(this::toResponse)
                 .toList();
+    }
+
+    public BancaResponseDTO findByTccId(Long tccId) {
+        Banca banca = bancaRepository.findByTccId(tccId)
+                .orElseThrow(() -> new RuntimeException("Banca nao encontrada"));
+
+        return toResponse(banca);
     }
 
     // Buscar por ID
@@ -63,13 +61,7 @@ public class BancaService {
                 .orElseThrow(() ->
                         new RuntimeException("Banca não encontrada"));
 
-        return new BancaResponseDTO(
-                banca.getId(),
-                banca.getData(),
-                banca.getLocal(),
-                banca.getNotaFinal(),
-                banca.getTcc().getId()
-        );
+        return toResponse(banca);
     }
 
     // Atualizar
@@ -86,18 +78,63 @@ public class BancaService {
         banca.setNotaFinal(request.getNotaFinal());
         banca.setTcc(tcc);
 
-        banca = bancaRepository.save(banca);
-
-        return new BancaResponseDTO(
-                banca.getId(),
-                banca.getData(),
-                banca.getLocal(),
-                banca.getNotaFinal(),
-                banca.getTcc().getId()
-        );
+        updateTccStatusFromBanca(tcc, request.getNotaFinal());
+        return toResponse(bancaRepository.save(banca));
     }
 
     public void deleteById(Long id) {
         bancaRepository.deleteById(id);
+    }
+
+    private BancaResponseDTO toResponse(Banca banca) {
+        Tcc tcc = banca.getTcc();
+        BancaResponseDTO response = new BancaResponseDTO(
+                banca.getId(),
+                banca.getData(),
+                banca.getLocal(),
+                banca.getNotaFinal(),
+                tcc.getId()
+        );
+
+        response.setTccTitulo(tcc.getTitulo());
+        if (tcc.getAluno() != null) {
+            response.setAlunoId(tcc.getAluno().getId());
+            if (tcc.getAluno().getUsuario() != null) {
+                response.setAlunoNome(tcc.getAluno().getUsuario().getNome());
+            }
+        }
+        if (tcc.getOrientador() != null) {
+            response.setOrientadorId(tcc.getOrientador().getId());
+            if (tcc.getOrientador().getUsuario() != null) {
+                response.setOrientadorNome(tcc.getOrientador().getUsuario().getNome());
+            }
+        }
+
+        List<Avaliador> avaliadores = avaliadorRepository.findByBancaId(banca.getId());
+        response.setAvaliadores(avaliadores.stream()
+                .map(avaliador -> new BancaResponseDTO.AvaliadorResumoDTO(
+                        avaliador.getId(),
+                        avaliador.getProfessor().getId(),
+                        avaliador.getProfessor().getUsuario() != null
+                                ? avaliador.getProfessor().getUsuario().getNome()
+                                : null,
+                        avaliador.getPapel() != null ? avaliador.getPapel().name() : null
+                ))
+                .toList());
+
+        return response;
+    }
+
+    private void updateTccStatusFromBanca(Tcc tcc, Double notaFinal) {
+        if (notaFinal != null) {
+            tcc.setStatus(notaFinal >= 7.0 ? StatusTcc.APROVADO : StatusTcc.REPROVADO);
+        } else if (
+                tcc.getStatus() == StatusTcc.EM_DESENVOLVIMENTO
+                        || tcc.getStatus() == StatusTcc.APROVADO
+                        || tcc.getStatus() == StatusTcc.REPROVADO
+        ) {
+            tcc.setStatus(StatusTcc.EM_BANCA);
+        }
+        tccRepository.save(tcc);
     }
 }

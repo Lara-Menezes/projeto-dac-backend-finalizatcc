@@ -3,6 +3,7 @@ package org.example.services;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.ProfessorRequestDTO;
+import org.example.dto.request.ProfessorUpdateRequestDTO;
 import org.example.dto.response.ProfessorResponseDTO;
 import org.example.enums.TipoUsuario;
 import org.example.model.*;
@@ -26,12 +27,17 @@ public class ProfessorService {
 
     // Adicionar (Create)
     public ProfessorResponseDTO save(ProfessorRequestDTO request) {
+        TipoUsuario tipoUsuario = Boolean.TRUE.equals(request.getCoordenador())
+                || request.getTipo() == TipoUsuario.COORDENADOR
+                ? TipoUsuario.COORDENADOR
+                : TipoUsuario.PROFESSOR;
+
         // Criar Usuario primeiro
         Usuario usuario = Usuario.builder()
                 .nome(request.getNome())
                 .email(request.getEmail())
                 .senha(request.getSenha()) // Nota: em produção, criptografar senha
-                .tipo(TipoUsuario.PROFESSOR)
+                .tipo(tipoUsuario)
                 .ativo(true)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -87,27 +93,25 @@ public class ProfessorService {
     }
 
     // Atualizar
-    public ProfessorResponseDTO update(Long id, ProfessorRequestDTO request) {
+    public ProfessorResponseDTO update(Long id, ProfessorUpdateRequestDTO request) {
 
         Professor professor = professorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
 
         Usuario usuario = professor.getUsuario();
 
-        // Atualizar Usuario
-        usuario.setNome(request.getNome());
-        usuario.setEmail(request.getEmail());
-
-        // Atualiza senha apenas se enviada
-        if (request.getSenha() != null && !request.getSenha().isBlank()) {
-            usuario.setSenha(request.getSenha());
+        if (request.getNome() != null && !request.getNome().isBlank()) {
+            usuario.setNome(request.getNome());
         }
 
         usuarioRepository.save(usuario);
 
-        // Atualizar Professor
-        professor.setAreaAtuacao(request.getAreaAtuacao());
-        professor.setTitulacao(request.getTitulacao());
+        if (request.getAreaAtuacao() != null && !request.getAreaAtuacao().isBlank()) {
+            professor.setAreaAtuacao(request.getAreaAtuacao());
+        }
+        if (request.getTitulacao() != null && !request.getTitulacao().isBlank()) {
+            professor.setTitulacao(request.getTitulacao());
+        }
 
         professor = professorRepository.save(professor);
 

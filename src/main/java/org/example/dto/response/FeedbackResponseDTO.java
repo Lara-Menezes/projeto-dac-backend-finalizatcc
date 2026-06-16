@@ -16,4 +16,21 @@ public class FeedbackResponseDTO {
     private LocalDateTime data;
     private Long submissaoId;
     private Long professorId;
+    private String professorNome;
+
+    public FeedbackResponseDTO(
+            Long id,
+            String comentario,
+            Double nota,
+            LocalDateTime data,
+            Long submissaoId,
+            Long professorId
+    ) {
+        this.id = id;
+        this.comentario = comentario;
+        this.nota = nota;
+        this.data = data;
+        this.submissaoId = submissaoId;
+        this.professorId = professorId;
+    }
 }

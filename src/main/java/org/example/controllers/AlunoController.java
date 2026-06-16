@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
 import org.example.dto.request.AlunoRequestDTO;
+import org.example.dto.request.AlunoUpdateRequestDTO;
 import org.example.dto.response.AlunoResponseDTO;
 import org.example.services.AlunoService;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class AlunoController {
     @PutMapping("/{id}")
     public ResponseEntity<AlunoResponseDTO> updateAluno(
             @PathVariable Long id,
-            @Valid @RequestBody AlunoRequestDTO request) {
+            @RequestBody AlunoUpdateRequestDTO request) {
 
         AlunoResponseDTO response = alunoService.update(id, request);
 

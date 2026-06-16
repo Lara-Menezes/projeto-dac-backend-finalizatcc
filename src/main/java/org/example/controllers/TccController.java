@@ -34,6 +34,18 @@ public class TccController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/aluno/{alunoId}")
+    public ResponseEntity<List<TccResponseDTO>> findByAluno(@PathVariable Long alunoId) {
+        List<TccResponseDTO> response = tccService.findByAlunoId(alunoId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/professor/{professorId}")
+    public ResponseEntity<List<TccResponseDTO>> findByProfessor(@PathVariable Long professorId) {
+        List<TccResponseDTO> response = tccService.findByProfessorId(professorId);
+        return ResponseEntity.ok(response);
+    }
+
     // Buscar TCC por ID
     @GetMapping("/{id}")
     public ResponseEntity<TccResponseDTO> findById(@PathVariable Long id) {

@@ -34,6 +34,18 @@ public class FeedbackController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/submissao/{submissaoId}")
+    public ResponseEntity<List<FeedbackResponseDTO>> findBySubmissao(@PathVariable Long submissaoId) {
+        List<FeedbackResponseDTO> response = feedBackService.findBySubmissaoId(submissaoId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/tcc/{tccId}")
+    public ResponseEntity<List<FeedbackResponseDTO>> findByTcc(@PathVariable Long tccId) {
+        List<FeedbackResponseDTO> response = feedBackService.findByTccId(tccId);
+        return ResponseEntity.ok(response);
+    }
+
     // Buscar feedback por ID
     @GetMapping("/{id}")
     public ResponseEntity<FeedbackResponseDTO> findById(@PathVariable Long id) {

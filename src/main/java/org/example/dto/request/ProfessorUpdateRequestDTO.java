@@ -1,0 +1,14 @@
+package org.example.dto.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProfessorUpdateRequestDTO {
+    private String nome;
+    private String areaAtuacao;
+    private String titulacao;
+}
