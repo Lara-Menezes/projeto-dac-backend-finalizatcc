@@ -25,20 +25,12 @@ public class TccService {
     private final ProfessorRepository professorRepository;
 
     public TccResponseDTO save(TccRequestDTO request) {
-        AreaPesquisa area = null;
-        if (request.getAreaId() != null) {
-            area = areaPesquisaRepository.findById(request.getAreaId())
-                    .orElseThrow(() -> new RuntimeException("Área de pesquisa não encontrada"));
-        }
+        AreaPesquisa area = findAreaOrNull(request.getAreaId());
         Aluno aluno = alunoRepository.findById(request.getAlunoId())
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Aluno nao encontrado"));
         Professor orientador = professorRepository.findById(request.getOrientadorId())
-                .orElseThrow(() -> new RuntimeException("Orientador não encontrado"));
-        Professor coorientador = null;
-        if (request.getCoorientadorId() != null) {
-            coorientador = professorRepository.findById(request.getCoorientadorId())
-                    .orElseThrow(() -> new RuntimeException("Coorientador não encontrado"));
-        }
+                .orElseThrow(() -> new RuntimeException("Orientador nao encontrado"));
+        Professor coorientador = findProfessorOrNull(request.getCoorientadorId(), "Coorientador nao encontrado");
 
         Tcc tcc = Tcc.builder()
                 .titulo(request.getTitulo())
@@ -52,102 +44,44 @@ public class TccService {
                 .dataFim(request.getDataFim())
                 .build();
 
-        tcc = tccRepository.save(tcc);
-
-        return new TccResponseDTO(
-                tcc.getId(),
-                tcc.getTitulo(),
-                tcc.getResumo(),
-                tcc.getArea() != null ? tcc.getArea().getId() : null,
-                tcc.getAluno().getId(),
-                tcc.getOrientador().getId(),
-                tcc.getCoorientador() != null ? tcc.getCoorientador().getId() : null,
-                tcc.getStatus(),
-                tcc.getDataInicio(),
-                tcc.getDataFim()
-        );
+        return toResponse(tccRepository.save(tcc));
     }
 
-    // Listar
     public List<TccResponseDTO> findAll() {
-
-        List<Tcc> tccs = tccRepository.findAll();
-
-        return tccs.stream()
-                .map(tcc -> new TccResponseDTO(
-                        tcc.getId(),
-                        tcc.getTitulo(),
-                        tcc.getResumo(),
-                        tcc.getArea() != null
-                                ? tcc.getArea().getId()
-                                : null,
-                        tcc.getAluno().getId(),
-                        tcc.getOrientador().getId(),
-                        tcc.getCoorientador() != null
-                                ? tcc.getCoorientador().getId()
-                                : null,
-                        tcc.getStatus(),
-                        tcc.getDataInicio(),
-                        tcc.getDataFim()
-                ))
+        return tccRepository.findAll().stream()
+                .map(this::toResponse)
                 .toList();
     }
 
-    // Buscar por ID
-    public TccResponseDTO findById(Long id) {
-
-        Tcc tcc = tccRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("TCC não encontrado"));
-
-        return new TccResponseDTO(
-                tcc.getId(),
-                tcc.getTitulo(),
-                tcc.getResumo(),
-                tcc.getArea() != null
-                        ? tcc.getArea().getId()
-                        : null,
-                tcc.getAluno().getId(),
-                tcc.getOrientador().getId(),
-                tcc.getCoorientador() != null
-                        ? tcc.getCoorientador().getId()
-                        : null,
-                tcc.getStatus(),
-                tcc.getDataInicio(),
-                tcc.getDataFim()
-        );
+    public List<TccResponseDTO> findByAlunoId(Long alunoId) {
+        return tccRepository.findByAlunoId(alunoId).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    // Atualizar
-    public TccResponseDTO update(Long id, TccRequestDTO request) {
+    public List<TccResponseDTO> findByProfessorId(Long professorId) {
+        return tccRepository.findByOrientadorId(professorId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
 
+    public TccResponseDTO findById(Long id) {
         Tcc tcc = tccRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("TCC não encontrado"));
+                .orElseThrow(() -> new RuntimeException("TCC nao encontrado"));
 
-        AreaPesquisa area = null;
+        return toResponse(tcc);
+    }
 
-        if (request.getAreaId() != null) {
-            area = areaPesquisaRepository.findById(request.getAreaId())
-                    .orElseThrow(() ->
-                            new RuntimeException("Área de pesquisa não encontrada"));
-        }
+    public TccResponseDTO update(Long id, TccRequestDTO request) {
+        Tcc tcc = tccRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("TCC nao encontrado"));
 
+        AreaPesquisa area = findAreaOrNull(request.getAreaId());
         Aluno aluno = alunoRepository.findById(request.getAlunoId())
-                .orElseThrow(() ->
-                        new RuntimeException("Aluno não encontrado"));
-
+                .orElseThrow(() -> new RuntimeException("Aluno nao encontrado"));
         Professor orientador = professorRepository.findById(request.getOrientadorId())
-                .orElseThrow(() ->
-                        new RuntimeException("Orientador não encontrado"));
-
-        Professor coorientador = null;
-
-        if (request.getCoorientadorId() != null) {
-            coorientador = professorRepository.findById(request.getCoorientadorId())
-                    .orElseThrow(() ->
-                            new RuntimeException("Coorientador não encontrado"));
-        }
+                .orElseThrow(() -> new RuntimeException("Orientador nao encontrado"));
+        Professor coorientador = findProfessorOrNull(request.getCoorientadorId(), "Coorientador nao encontrado");
 
         tcc.setTitulo(request.getTitulo());
         tcc.setResumo(request.getResumo());
@@ -159,25 +93,71 @@ public class TccService {
         tcc.setDataInicio(request.getDataInicio());
         tcc.setDataFim(request.getDataFim());
 
-        tcc = tccRepository.save(tcc);
+        return toResponse(tccRepository.save(tcc));
+    }
 
-        return new TccResponseDTO(
+    public void deleteById(Long id) {
+        tccRepository.deleteById(id);
+    }
+
+    private AreaPesquisa findAreaOrNull(Long areaId) {
+        if (areaId == null) return null;
+        return areaPesquisaRepository.findById(areaId)
+                .orElseThrow(() -> new RuntimeException("Area de pesquisa nao encontrada"));
+    }
+
+    private Professor findProfessorOrNull(Long professorId, String message) {
+        if (professorId == null) return null;
+        return professorRepository.findById(professorId)
+                .orElseThrow(() -> new RuntimeException(message));
+    }
+
+    private TccResponseDTO toResponse(Tcc tcc) {
+        TccResponseDTO response = new TccResponseDTO(
                 tcc.getId(),
                 tcc.getTitulo(),
                 tcc.getResumo(),
                 tcc.getArea() != null ? tcc.getArea().getId() : null,
                 tcc.getAluno().getId(),
                 tcc.getOrientador().getId(),
-                tcc.getCoorientador() != null
-                        ? tcc.getCoorientador().getId()
-                        : null,
+                tcc.getCoorientador() != null ? tcc.getCoorientador().getId() : null,
                 tcc.getStatus(),
                 tcc.getDataInicio(),
                 tcc.getDataFim()
         );
-    }
 
-    public void deleteById(Long id) {
-        tccRepository.deleteById(id);
+        response.setAreaNome(tcc.getArea() != null ? tcc.getArea().getNome() : null);
+        response.setAlunoNome(
+                tcc.getAluno() != null && tcc.getAluno().getUsuario() != null
+                        ? tcc.getAluno().getUsuario().getNome()
+                        : null
+        );
+        response.setAlunoEmail(
+                tcc.getAluno() != null && tcc.getAluno().getUsuario() != null
+                        ? tcc.getAluno().getUsuario().getEmail()
+                        : null
+        );
+        response.setOrientadorNome(
+                tcc.getOrientador() != null && tcc.getOrientador().getUsuario() != null
+                        ? tcc.getOrientador().getUsuario().getNome()
+                        : null
+        );
+        response.setOrientadorEmail(
+                tcc.getOrientador() != null && tcc.getOrientador().getUsuario() != null
+                        ? tcc.getOrientador().getUsuario().getEmail()
+                        : null
+        );
+        response.setCoorientadorNome(
+                tcc.getCoorientador() != null && tcc.getCoorientador().getUsuario() != null
+                        ? tcc.getCoorientador().getUsuario().getNome()
+                        : null
+        );
+        response.setCoorientadorEmail(
+                tcc.getCoorientador() != null && tcc.getCoorientador().getUsuario() != null
+                        ? tcc.getCoorientador().getUsuario().getEmail()
+                        : null
+        );
+
+        return response;
     }
 }

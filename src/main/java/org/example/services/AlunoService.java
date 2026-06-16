@@ -3,6 +3,7 @@ package org.example.services;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.AlunoRequestDTO;
+import org.example.dto.request.AlunoUpdateRequestDTO;
 import org.example.dto.response.AlunoResponseDTO;
 import org.example.enums.TipoUsuario;
 import org.example.model.*;
@@ -89,28 +90,25 @@ public class AlunoService {
     }
 
     // Atualizar
-    public AlunoResponseDTO update(Long id, AlunoRequestDTO request) {
+    public AlunoResponseDTO update(Long id, AlunoUpdateRequestDTO request) {
 
         Aluno aluno = alunoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
 
         Usuario usuario = aluno.getUsuario();
 
-        // Atualizar Usuario
-        usuario.setNome(request.getNome());
-        usuario.setEmail(request.getEmail());
-
-        // Atualizar senha apenas se enviada
-        if (request.getSenha() != null && !request.getSenha().isBlank()) {
-            usuario.setSenha(request.getSenha());
+        if (request.getNome() != null && !request.getNome().isBlank()) {
+            usuario.setNome(request.getNome());
         }
 
         usuarioRepository.save(usuario);
 
-        // Atualizar Aluno
-        aluno.setMatricula(request.getMatricula());
-        aluno.setCurso(request.getCurso());
-        aluno.setPeriodo(request.getPeriodo());
+        if (request.getCurso() != null && !request.getCurso().isBlank()) {
+            aluno.setCurso(request.getCurso());
+        }
+        if (request.getPeriodo() != null) {
+            aluno.setPeriodo(request.getPeriodo());
+        }
 
         aluno = alunoRepository.save(aluno);
 

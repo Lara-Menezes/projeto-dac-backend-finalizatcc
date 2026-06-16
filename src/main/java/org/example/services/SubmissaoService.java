@@ -60,6 +60,19 @@ public class SubmissaoService {
                 .toList();
     }
 
+    public List<SubmissaoResponseDTO> findByTccId(Long tccId) {
+        return submissaoRepository.findByTccId(tccId).stream()
+                .map(submissao -> new SubmissaoResponseDTO(
+                        submissao.getId(),
+                        submissao.getVersao(),
+                        submissao.getDataEnvio(),
+                        submissao.getStatus(),
+                        submissao.getPrazoEntrega(),
+                        submissao.getTcc().getId()
+                ))
+                .toList();
+    }
+
     // Buscar por ID
     public SubmissaoResponseDTO findById(Long id) {
 

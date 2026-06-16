@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.enums.TipoUsuario;
 
 @Data
 @NoArgsConstructor
@@ -25,5 +26,9 @@ public class ProfessorRequestDTO {
     
     @NotBlank(message = "Titulação é obrigatória")
     private String titulacao;
+
+    private TipoUsuario tipo;
+
+    private Boolean coordenador;
 }
 

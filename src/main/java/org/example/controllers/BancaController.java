@@ -34,6 +34,12 @@ public class BancaController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/tcc/{tccId}")
+    public ResponseEntity<BancaResponseDTO> findByTcc(@PathVariable Long tccId) {
+        BancaResponseDTO response = bancaService.findByTccId(tccId);
+        return ResponseEntity.ok(response);
+    }
+
     // Buscar banca por ID
     @GetMapping("/{id}")
     public ResponseEntity<BancaResponseDTO> findById(@PathVariable Long id) {

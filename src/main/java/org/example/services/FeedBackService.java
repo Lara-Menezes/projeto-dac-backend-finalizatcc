@@ -24,9 +24,9 @@ public class FeedBackService {
 
     public FeedbackResponseDTO save(FeedbackRequestDTO request) {
         Submissao submissao = submissaoRepository.findById(request.getSubmissaoId())
-                .orElseThrow(() -> new RuntimeException("Submissão não encontrada"));
+                .orElseThrow(() -> new RuntimeException("Submissao nao encontrada"));
         Professor professor = professorRepository.findById(request.getProfessorId())
-                .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Professor nao encontrado"));
 
         Feedback feedback = Feedback.builder()
                 .comentario(request.getComentario())
@@ -36,79 +36,60 @@ public class FeedBackService {
                 .professor(professor)
                 .build();
 
-        feedback = feedbackRepository.save(feedback);
-
-        return new FeedbackResponseDTO(
-                feedback.getId(),
-                feedback.getComentario(),
-                feedback.getNota(),
-                feedback.getData(),
-                feedback.getSubmissao().getId(),
-                feedback.getProfessor().getId()
-        );
+        return toResponse(feedbackRepository.save(feedback));
     }
 
-    // Listar
     public List<FeedbackResponseDTO> findAll() {
-
-        List<Feedback> feedbacks = feedbackRepository.findAll();
-
-        return feedbacks.stream()
-                .map(feedback -> new FeedbackResponseDTO(
-                        feedback.getId(),
-                        feedback.getComentario(),
-                        feedback.getNota(),
-                        feedback.getData(),
-                        feedback.getSubmissao().getId(),
-                        feedback.getProfessor().getId()
-                ))
+        return feedbackRepository.findAll().stream()
+                .map(this::toResponse)
                 .toList();
     }
 
-    // Buscar por ID
-    public FeedbackResponseDTO findById(Long id) {
-
-        Feedback feedback = feedbackRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Feedback não encontrado"));
-
-        return new FeedbackResponseDTO(
-                feedback.getId(),
-                feedback.getComentario(),
-                feedback.getNota(),
-                feedback.getData(),
-                feedback.getSubmissao().getId(),
-                feedback.getProfessor().getId()
-        );
+    public List<FeedbackResponseDTO> findBySubmissaoId(Long submissaoId) {
+        return feedbackRepository.findBySubmissaoId(submissaoId).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    // Atualizar
-    public FeedbackResponseDTO update(Long id, FeedbackRequestDTO request) {
+    public List<FeedbackResponseDTO> findByTccId(Long tccId) {
+        return feedbackRepository.findAll().stream()
+                .filter(feedback -> feedback.getSubmissao().getTcc().getId().equals(tccId))
+                .map(this::toResponse)
+                .toList();
+    }
 
+    public FeedbackResponseDTO findById(Long id) {
         Feedback feedback = feedbackRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Feedback não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Feedback nao encontrado"));
+
+        return toResponse(feedback);
+    }
+
+    public FeedbackResponseDTO update(Long id, FeedbackRequestDTO request) {
+        Feedback feedback = feedbackRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Feedback nao encontrado"));
 
         Submissao submissao = submissaoRepository.findById(request.getSubmissaoId())
-                .orElseThrow(() -> new RuntimeException("Submissão não encontrada"));
+                .orElseThrow(() -> new RuntimeException("Submissao nao encontrada"));
 
         Professor professor = professorRepository.findById(request.getProfessorId())
-                .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Professor nao encontrado"));
 
         feedback.setComentario(request.getComentario());
         feedback.setNota(request.getNota());
         feedback.setSubmissao(submissao);
         feedback.setProfessor(professor);
+        feedback.setData(request.getData() != null ? request.getData() : feedback.getData());
 
-        // Mantém data atual se vier null
-        feedback.setData(
-                request.getData() != null
-                        ? request.getData()
-                        : feedback.getData()
-        );
+        return toResponse(feedbackRepository.save(feedback));
+    }
 
-        feedback = feedbackRepository.save(feedback);
+    public void deleteById(Long id) {
+        feedbackRepository.deleteById(id);
+    }
 
-        return new FeedbackResponseDTO(
+    private FeedbackResponseDTO toResponse(Feedback feedback) {
+        FeedbackResponseDTO response = new FeedbackResponseDTO(
                 feedback.getId(),
                 feedback.getComentario(),
                 feedback.getNota(),
@@ -116,9 +97,11 @@ public class FeedBackService {
                 feedback.getSubmissao().getId(),
                 feedback.getProfessor().getId()
         );
-    }
-
-    public void deleteById(Long id) {
-        feedbackRepository.deleteById(id);
+        response.setProfessorNome(
+                feedback.getProfessor() != null && feedback.getProfessor().getUsuario() != null
+                        ? feedback.getProfessor().getUsuario().getNome()
+                        : null
+        );
+        return response;
     }
 }
