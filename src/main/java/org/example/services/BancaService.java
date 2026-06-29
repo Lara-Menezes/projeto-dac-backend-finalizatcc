@@ -10,7 +10,9 @@ import org.example.model.Tcc;
 import org.example.repositories.AvaliadorRepository;
 import org.example.repositories.BancaRepository;
 import org.example.repositories.TccRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -25,6 +27,8 @@ public class BancaService {
     public BancaResponseDTO save(BancaRequestDTO request) {
         Tcc tcc = tccRepository.findById(request.getTccId())
                 .orElseThrow(() -> new RuntimeException("TCC não encontrado"));
+
+        validarCriacaoBanca(tcc);
 
         Banca banca = Banca.builder()
                 .data(request.getData())
@@ -48,10 +52,9 @@ public class BancaService {
     }
 
     public BancaResponseDTO findByTccId(Long tccId) {
-        Banca banca = bancaRepository.findByTccId(tccId)
-                .orElseThrow(() -> new RuntimeException("Banca nao encontrada"));
-
-        return toResponse(banca);
+        return bancaRepository.findByTccId(tccId)
+                .map(this::toResponse)
+                .orElse(null);
     }
 
     // Buscar por ID
@@ -83,7 +86,18 @@ public class BancaService {
     }
 
     public void deleteById(Long id) {
-        bancaRepository.deleteById(id);
+        Banca banca = bancaRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Banca não encontrada"));
+
+        Tcc tcc = banca.getTcc();
+
+        bancaRepository.delete(banca);
+
+        if (tcc != null && tcc.getStatus() == StatusTcc.EM_BANCA) {
+            tcc.setStatus(StatusTcc.EM_DESENVOLVIMENTO);
+            tccRepository.save(tcc);
+        }
     }
 
     private BancaResponseDTO toResponse(Banca banca) {
@@ -125,14 +139,24 @@ public class BancaService {
         return response;
     }
 
+    private void validarCriacaoBanca(Tcc tcc) {
+        if (tcc.getStatus() == StatusTcc.APROVADO) {
+            throw new RuntimeException("TCC aprovado não pode receber banca");
+        }
+
+        if (tcc.getStatus() == StatusTcc.REPROVADO) {
+            throw new RuntimeException("TCC reprovado não pode receber banca");
+        }
+
+        if (bancaRepository.findByTccId(tcc.getId()).isPresent()) {
+            throw new RuntimeException("Este TCC já possui banca cadastrada");
+        }
+    }
+
     private void updateTccStatusFromBanca(Tcc tcc, Double notaFinal) {
         if (notaFinal != null) {
             tcc.setStatus(notaFinal >= 7.0 ? StatusTcc.APROVADO : StatusTcc.REPROVADO);
-        } else if (
-                tcc.getStatus() == StatusTcc.EM_DESENVOLVIMENTO
-                        || tcc.getStatus() == StatusTcc.APROVADO
-                        || tcc.getStatus() == StatusTcc.REPROVADO
-        ) {
+        } else if (tcc.getStatus() == StatusTcc.EM_DESENVOLVIMENTO) {
             tcc.setStatus(StatusTcc.EM_BANCA);
         }
         tccRepository.save(tcc);
