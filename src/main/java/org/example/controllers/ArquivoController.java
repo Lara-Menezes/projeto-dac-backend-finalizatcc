@@ -99,4 +99,16 @@ public class ArquivoController {
         arquivoService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    //Visualizar sem baixar
+    @GetMapping("/{id}/visualizar")
+    public ResponseEntity<?> visualizar(@PathVariable Long id) {
+
+        ArquivoDownload download = arquivoService.download(id);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
+                .body(download.resource());
+    }
 }
