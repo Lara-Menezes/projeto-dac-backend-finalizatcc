@@ -16,6 +16,7 @@ import org.example.repositories.ProfessorRepository;
 import org.example.repositories.TccRepository;
 import org.example.repositories.UsuarioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,13 +32,14 @@ public class UsuarioService {
     private final ProfessorRepository professorRepository;
     private final AvaliadorRepository avaliadorRepository;
     private final TccRepository tccRepository;
+    private final PasswordEncoder passwordEncoder;
     private final BancaRepository bancaRepository;
 
     public UsuarioResponseDTO save(UsuarioRequestDTO request) {
         Usuario usuario = Usuario.builder()
                 .nome(request.getNome())
                 .email(request.getEmail())
-                .senha(request.getSenha()) // Nota: em produção, criptografar senha
+                .senha(passwordEncoder.encode(request.getSenha()))
                 .tipo(request.getTipo())
                 .ativo(request.getAtivo() != null ? request.getAtivo() : true)
                 .createdAt(request.getCreatedAt() != null ? request.getCreatedAt() : LocalDateTime.now())
@@ -101,7 +103,11 @@ public class UsuarioService {
 
         // Atualiza senha apenas se enviada
         if (request.getSenha() != null && !request.getSenha().isBlank()) {
-            usuario.setSenha(request.getSenha());
+            usuario.setSenha(
+                    passwordEncoder.encode(
+                            request.getSenha()
+                    )
+            );
         }
 
         usuario.setTipo(request.getTipo());

@@ -9,8 +9,11 @@ import org.example.enums.TipoUsuario;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginResponseDTO {
+
+    private String token;
     private Long id;
     private String nome;
     private String email;
     private TipoUsuario tipo;
+
 }
