@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import org.springframework.http.MediaType;
 
 
 @Component
@@ -65,15 +66,15 @@ public class JwtFilter extends OncePerRequestFilter {
                             new WebAuthenticationDetailsSource()
                                     .buildDetails(request)
                     );
-                    System.out.println("Usuário: " + usuario.getUsername());
-                    System.out.println("Authorities: " + usuario.getAuthorities());
-
                     SecurityContextHolder.getContext()
                             .setAuthentication(authentication);
                 }
 
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Token inválido ou expirado\"}");
                 return;
             }
         }

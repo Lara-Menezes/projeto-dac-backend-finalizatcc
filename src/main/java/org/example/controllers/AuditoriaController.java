@@ -8,10 +8,12 @@ import org.example.dto.response.AuditoriaResponseDTO;
 import org.example.services.AuditoriaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auditorias")
+@PreAuthorize("hasRole('COORDENADOR')")
 @RequiredArgsConstructor
 public class AuditoriaController {
 

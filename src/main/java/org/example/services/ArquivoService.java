@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -148,6 +150,16 @@ public class ArquivoService {
         }
     }
 
+    public ArquivoResponseDTO uploadForAluno(MultipartFile file, Long submissaoId,
+                                              TipoArquivo tipo, String email) {
+        Submissao submissao = submissaoRepository.findById(submissaoId)
+                .orElseThrow(() -> new RuntimeException("Submissão não encontrada"));
+        if (!submissao.getTcc().getAluno().getUsuario().getEmail().equalsIgnoreCase(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Submissão não pertence ao aluno autenticado");
+        }
+        return upload(file, submissaoId, tipo);
+    }
+
     // Download
     public ArquivoDownload download(Long id) {
 
@@ -181,6 +193,33 @@ public class ArquivoService {
                     "Caminho de arquivo inválido",
                     e
             );
+        }
+    }
+
+    public ArquivoDownload downloadAuthorized(Long id, String email, boolean coordenador) {
+        Arquivo arquivo = arquivoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Arquivo não encontrado"));
+        assertCanAccess(arquivo.getSubmissao(), email, coordenador);
+        return download(id);
+    }
+
+    public List<ArquivoResponseDTO> findBySubmissaoAuthorized(Long submissaoId, String email,
+                                                               boolean coordenador) {
+        Submissao submissao = submissaoRepository.findById(submissaoId)
+                .orElseThrow(() -> new RuntimeException("Submissão não encontrada"));
+        assertCanAccess(submissao, email, coordenador);
+        return findBySubmissaoId(submissaoId);
+    }
+
+    private void assertCanAccess(Submissao submissao, String email, boolean coordenador) {
+        if (coordenador) return;
+        var tcc = submissao.getTcc();
+        boolean aluno = tcc.getAluno().getUsuario().getEmail().equalsIgnoreCase(email);
+        boolean orientador = tcc.getOrientador().getUsuario().getEmail().equalsIgnoreCase(email);
+        boolean coorientador = tcc.getCoorientador() != null
+                && tcc.getCoorientador().getUsuario().getEmail().equalsIgnoreCase(email);
+        if (!aluno && !orientador && !coorientador) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado ao arquivo");
         }
     }
 

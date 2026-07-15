@@ -3,10 +3,13 @@ package org.example.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.BancaRequestDTO;
+import org.example.dto.request.NotaFinalRequestDTO;
 import org.example.dto.response.BancaResponseDTO;
 import org.example.services.BancaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +22,7 @@ public class BancaController {
     private final BancaService bancaService;
 
     // Criar Banca
+    @PreAuthorize("hasRole('COORDENADOR')")
     @PostMapping("/create")
     public ResponseEntity<BancaResponseDTO> createBanca(@Valid @RequestBody BancaRequestDTO request) {
         BancaResponseDTO response = bancaService.save(request);
@@ -26,6 +30,7 @@ public class BancaController {
     }
 
     // Listar Bancas
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping
     public ResponseEntity<List<BancaResponseDTO>> listAll() {
 
@@ -34,13 +39,36 @@ public class BancaController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ALUNO')")
+    @GetMapping("/me")
+    public ResponseEntity<List<BancaResponseDTO>> minhasBancas(Authentication authentication) {
+        return ResponseEntity.ok(bancaService.findForAluno(authentication.getName()));
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @GetMapping("/professor/me")
+    public ResponseEntity<List<BancaResponseDTO>> bancasDoProfessor(Authentication authentication) {
+        return ResponseEntity.ok(bancaService.findForProfessor(authentication.getName()));
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @PatchMapping("/{id}/nota-final")
+    public ResponseEntity<BancaResponseDTO> registrarNotaFinal(
+            @PathVariable Long id, Authentication authentication,
+            @Valid @RequestBody NotaFinalRequestDTO request) {
+        return ResponseEntity.ok(bancaService.updateGradeForProfessor(
+                id, authentication.getName(), request.getNotaFinal()));
+    }
+
     @GetMapping("/tcc/{tccId}")
+    @PreAuthorize("hasRole('COORDENADOR')")
     public ResponseEntity<BancaResponseDTO> findByTcc(@PathVariable Long tccId) {
         BancaResponseDTO response = bancaService.findByTccId(tccId);
         return ResponseEntity.ok(response);
     }
 
     // Buscar banca por ID
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<BancaResponseDTO> findById(@PathVariable Long id) {
 
@@ -50,6 +78,7 @@ public class BancaController {
     }
 
     // Atualizar banca
+    @PreAuthorize("hasRole('COORDENADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<BancaResponseDTO> updateBanca(
             @PathVariable Long id,
@@ -61,6 +90,7 @@ public class BancaController {
     }
 
     // Deletar Banca
+    @PreAuthorize("hasRole('COORDENADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBanca(@PathVariable Long id) {
         bancaService.deleteById(id);

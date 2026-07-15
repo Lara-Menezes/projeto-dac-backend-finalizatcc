@@ -3,6 +3,7 @@ package org.example.controllers;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.SubmissaoRequestDTO;
+import org.example.dto.request.StatusSubmissaoRequestDTO;
 import org.example.dto.response.SubmissaoResponseDTO;
 import org.example.services.SubmissaoService;
 import org.springframework.http.HttpStatus;
@@ -23,9 +24,19 @@ public class SubmissaoController {
     // Criar Submissão
     @PreAuthorize("hasRole('ALUNO')")
     @PostMapping("/create")
-    public ResponseEntity<SubmissaoResponseDTO> createSubmissao(@Valid @RequestBody SubmissaoRequestDTO request) {
-        SubmissaoResponseDTO response = submissaoService.save(request);
+    public ResponseEntity<SubmissaoResponseDTO> createSubmissao(Authentication authentication,
+                                                                @Valid @RequestBody SubmissaoRequestDTO request) {
+        SubmissaoResponseDTO response = submissaoService.saveForAluno(authentication.getName(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<SubmissaoResponseDTO> updateStatus(
+            @PathVariable Long id, Authentication authentication,
+            @Valid @RequestBody StatusSubmissaoRequestDTO request) {
+        return ResponseEntity.ok(submissaoService.updateStatusForProfessor(
+                id, authentication.getName(), request.getStatus()));
     }
 
     // Listar submissões
@@ -50,7 +61,7 @@ public class SubmissaoController {
     }
 
     // Ver submissões dos TCCs que orienta
-    @PreAuthorize("hasAnyRole('PROFESSOR','COORDENADOR')")
+    @PreAuthorize("hasRole('PROFESSOR')")
     @GetMapping("/professor")
     public ResponseEntity<List<SubmissaoResponseDTO>> submissoesProfessor(
             Authentication authentication) {

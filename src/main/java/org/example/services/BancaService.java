@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +50,35 @@ public class BancaService {
         return bancas.stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    public List<BancaResponseDTO> findForAluno(String email) {
+        return bancaRepository.findByTccAlunoUsuarioEmail(email).stream()
+                .map(this::toResponse).toList();
+    }
+
+    public List<BancaResponseDTO> findForProfessor(String email) {
+        Stream<Banca> orientadas = Stream.concat(
+                bancaRepository.findByTccOrientadorUsuarioEmail(email).stream(),
+                bancaRepository.findByTccCoorientadorUsuarioEmail(email).stream());
+        Stream<Banca> participacoes = avaliadorRepository.findByProfessorUsuarioEmail(email).stream()
+                .map(Avaliador::getBanca);
+        return Stream.concat(orientadas, participacoes)
+                .distinct().map(this::toResponse).toList();
+    }
+
+    public BancaResponseDTO updateGradeForProfessor(Long id, String email, Double notaFinal) {
+        Banca banca = bancaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Banca não encontrada"));
+        boolean orientador = banca.getTcc().getOrientador().getUsuario().getEmail().equalsIgnoreCase(email);
+        boolean avaliador = avaliadorRepository.findByBancaId(id).stream()
+                .anyMatch(item -> item.getProfessor().getUsuario().getEmail().equalsIgnoreCase(email));
+        if (!orientador && !avaliador) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Professor não participa desta banca");
+        }
+        banca.setNotaFinal(notaFinal);
+        updateTccStatusFromBanca(banca.getTcc(), notaFinal);
+        return toResponse(bancaRepository.save(banca));
     }
 
     public BancaResponseDTO findByTccId(Long tccId) {

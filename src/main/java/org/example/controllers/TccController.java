@@ -23,8 +23,9 @@ public class TccController {
     // Criar TCC
     @PreAuthorize("hasRole('ALUNO')")
     @PostMapping("/create")
-    public ResponseEntity<TccResponseDTO> createTcc(@Valid @RequestBody TccRequestDTO request) {
-        TccResponseDTO response = tccService.save(request);
+    public ResponseEntity<TccResponseDTO> createTcc(Authentication authentication,
+                                                     @Valid @RequestBody TccRequestDTO request) {
+        TccResponseDTO response = tccService.saveForAluno(authentication.getName(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -57,15 +58,21 @@ public class TccController {
     }
 
     // TCCs de um professor
-    @PreAuthorize("hasAnyRole('PROFESSOR','COORDENADOR')")
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping("/professor/{professorId}")
     public ResponseEntity<List<TccResponseDTO>> findByProfessor(@PathVariable Long professorId) {
         List<TccResponseDTO> response = tccService.findByProfessorId(professorId);
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @GetMapping("/professor/me")
+    public ResponseEntity<List<TccResponseDTO>> meusOrientandos(Authentication authentication) {
+        return ResponseEntity.ok(tccService.findByProfessorEmail(authentication.getName()));
+    }
+
     // Buscar TCC por ID
-    @PreAuthorize("hasAnyRole('PROFESSOR','COORDENADOR')")
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<TccResponseDTO> findById(@PathVariable Long id) {
 

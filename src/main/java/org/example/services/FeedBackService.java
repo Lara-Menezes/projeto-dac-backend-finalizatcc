@@ -10,6 +10,8 @@ import org.example.repositories.FeedbackRepository;
 import org.example.repositories.ProfessorRepository;
 import org.example.repositories.SubmissaoRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +39,34 @@ public class FeedBackService {
                 .build();
 
         return toResponse(feedbackRepository.save(feedback));
+    }
+
+    public FeedbackResponseDTO saveForProfessor(String email, FeedbackRequestDTO request) {
+        Submissao submissao = submissaoRepository.findById(request.getSubmissaoId())
+                .orElseThrow(() -> new RuntimeException("Submissão não encontrada"));
+        Professor professor = professorRepository.findByUsuarioEmail(email)
+                .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+        var tcc = submissao.getTcc();
+        boolean orienta = tcc.getOrientador().getId().equals(professor.getId())
+                || (tcc.getCoorientador() != null && tcc.getCoorientador().getId().equals(professor.getId()));
+        if (!orienta) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Submissão não pertence a um orientando");
+        }
+        Feedback feedback = Feedback.builder()
+                .comentario(request.getComentario()).nota(request.getNota())
+                .data(request.getData() != null ? request.getData() : LocalDateTime.now())
+                .submissao(submissao).professor(professor).build();
+        return toResponse(feedbackRepository.save(feedback));
+    }
+
+    public List<FeedbackResponseDTO> findForAluno(String email) {
+        return feedbackRepository.findBySubmissaoTccAlunoUsuarioEmail(email).stream()
+                .map(this::toResponse).toList();
+    }
+
+    public List<FeedbackResponseDTO> findForProfessor(String email) {
+        return feedbackRepository.findByProfessorUsuarioEmail(email).stream()
+                .map(this::toResponse).toList();
     }
 
     public List<FeedbackResponseDTO> findAll() {

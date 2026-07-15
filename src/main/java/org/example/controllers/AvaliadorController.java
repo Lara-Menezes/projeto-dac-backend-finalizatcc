@@ -7,12 +7,14 @@ import org.example.dto.response.AvaliadorResponseDTO;
 import org.example.services.AvaliadorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/avaliadores")
+@PreAuthorize("hasRole('COORDENADOR')")
 @RequiredArgsConstructor
 public class AvaliadorController {
 

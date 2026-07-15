@@ -10,10 +10,13 @@ import org.example.repositories.AlunoRepository;
 import org.example.repositories.ProfessorRepository;
 import org.example.repositories.UsuarioRepository;
 import org.example.services.JwtService;
+import org.example.services.LegacyPasswordMigrationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import java.util.List;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,11 +30,14 @@ public class AuthController {
     private final AlunoRepository alunoRepository;
     private final ProfessorRepository professorRepository;
     private final JwtService jwtService;
+    private final LegacyPasswordMigrationService passwordMigrationService;
 
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(
             @Valid @RequestBody LoginRequestDTO request) {
+
+        passwordMigrationService.migrateIfNecessary(request.getEmail(), request.getSenha());
 
         Authentication authentication =
                 authenticationManager.authenticate(
@@ -42,9 +48,7 @@ public class AuthController {
                 );
 
 
-        Usuario usuario =
-                usuarioRepository.findByEmail(request.getEmail())
-                        .orElseThrow();
+        Usuario usuario = (Usuario) authentication.getPrincipal();
 
 
         String token = jwtService.gerarToken(usuario);
@@ -59,6 +63,7 @@ public class AuthController {
                         usuario.getEmail(),
                         usuario.getTipo()
                 );
+        response.setRoles(resolveRoles(usuario));
 
         return ResponseEntity.ok(response);
     }
@@ -80,6 +85,7 @@ public class AuthController {
                         usuario.getEmail(),
                         usuario.getTipo()
                 );
+        response.setRoles(resolveRoles(usuario));
 
 
         return ResponseEntity.ok(response);
@@ -122,6 +128,13 @@ public class AuthController {
         }
 
         return usuario.getId();
+    }
+
+    private List<String> resolveRoles(Usuario usuario) {
+        return usuario.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(role -> role.replaceFirst("^ROLE_", ""))
+                .toList();
     }
 
 }

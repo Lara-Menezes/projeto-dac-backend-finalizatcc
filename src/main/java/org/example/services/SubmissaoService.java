@@ -2,6 +2,11 @@ package org.example.services;
 
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.SubmissaoRequestDTO;
+import org.example.enums.StatusSubmissao;
+import org.example.model.Usuario;
+import org.example.repositories.UsuarioRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.example.dto.response.SubmissaoResponseDTO;
 import org.example.model.Submissao;
 import org.example.model.Tcc;
@@ -18,6 +23,7 @@ public class SubmissaoService {
 
     private final SubmissaoRepository submissaoRepository;
     private final TccRepository tccRepository;
+    private final UsuarioRepository usuarioRepository;
 
     public SubmissaoResponseDTO save(SubmissaoRequestDTO request) {
         Tcc tcc = tccRepository.findById(request.getTccId())
@@ -41,6 +47,30 @@ public class SubmissaoService {
                 submissao.getPrazoEntrega(),
                 submissao.getTcc().getId()
         );
+    }
+
+    public SubmissaoResponseDTO saveForAluno(String email, SubmissaoRequestDTO request) {
+        Tcc tcc = tccRepository.findById(request.getTccId())
+                .orElseThrow(() -> new RuntimeException("TCC não encontrado"));
+        if (!tcc.getAluno().getUsuario().getEmail().equalsIgnoreCase(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "TCC não pertence ao aluno autenticado");
+        }
+        request.setStatus(StatusSubmissao.ENVIADO);
+        return save(request);
+    }
+
+    public SubmissaoResponseDTO updateStatusForProfessor(Long id, String email, StatusSubmissao status) {
+        Submissao submissao = submissaoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Submissão não encontrada"));
+        Tcc tcc = submissao.getTcc();
+        boolean orienta = tcc.getOrientador().getUsuario().getEmail().equalsIgnoreCase(email)
+                || (tcc.getCoorientador() != null
+                && tcc.getCoorientador().getUsuario().getEmail().equalsIgnoreCase(email));
+        if (!orienta) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Submissão não pertence a um orientando");
+        }
+        submissao.setStatus(status);
+        return toResponse(submissaoRepository.save(submissao));
     }
 
     // Listar
@@ -79,8 +109,10 @@ public class SubmissaoService {
     // Busca por Professor email
     public List<SubmissaoResponseDTO> findByProfessorEmail(String email) {
 
-        return submissaoRepository.findByTccOrientadorUsuarioEmail(email)
-                .stream()
+        return java.util.stream.Stream.concat(
+                        submissaoRepository.findByTccOrientadorUsuarioEmail(email).stream(),
+                        submissaoRepository.findByTccCoorientadorUsuarioEmail(email).stream())
+                .distinct()
                 .map(submissao -> new SubmissaoResponseDTO(
                         submissao.getId(),
                         submissao.getVersao(),
@@ -157,5 +189,11 @@ public class SubmissaoService {
 
     public void deleteById(Long id) {
         submissaoRepository.deleteById(id);
+    }
+
+    private SubmissaoResponseDTO toResponse(Submissao submissao) {
+        return new SubmissaoResponseDTO(
+                submissao.getId(), submissao.getVersao(), submissao.getDataEnvio(),
+                submissao.getStatus(), submissao.getPrazoEntrega(), submissao.getTcc().getId());
     }
 }

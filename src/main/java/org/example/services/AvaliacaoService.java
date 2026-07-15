@@ -8,6 +8,8 @@ import org.example.model.Avaliador;
 import org.example.repositories.AvaliacaoRepository;
 import org.example.repositories.AvaliadorRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -36,6 +38,27 @@ public class AvaliacaoService {
                 avaliacao.getComentario(),
                 avaliacao.getAvaliador().getId()
         );
+    }
+
+    public AvaliacaoResponseDTO saveForProfessor(String email, AvaliacaoRequestDTO request) {
+        Avaliador avaliador = avaliadorRepository.findById(request.getAvaliadorId())
+                .orElseThrow(() -> new RuntimeException("Avaliador não encontrado"));
+        if (!avaliador.getProfessor().getUsuario().getEmail().equalsIgnoreCase(email)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Avaliador não pertence ao professor autenticado");
+        }
+        Avaliacao avaliacao = Avaliacao.builder().nota(request.getNota())
+                .comentario(request.getComentario()).avaliador(avaliador).build();
+        return toResponse(avaliacaoRepository.save(avaliacao));
+    }
+
+    public List<AvaliacaoResponseDTO> findForProfessor(String email) {
+        return avaliacaoRepository.findByAvaliadorProfessorUsuarioEmail(email).stream()
+                .map(this::toResponse).toList();
+    }
+
+    public List<AvaliacaoResponseDTO> findForAluno(String email) {
+        return avaliacaoRepository.findByAvaliadorBancaTccAlunoUsuarioEmail(email).stream()
+                .map(this::toResponse).toList();
     }
 
     // Listar
@@ -93,5 +116,10 @@ public class AvaliacaoService {
 
     public void deleteById(Long id) {
         avaliacaoRepository.deleteById(id);
+    }
+
+    private AvaliacaoResponseDTO toResponse(Avaliacao avaliacao) {
+        return new AvaliacaoResponseDTO(avaliacao.getId(), avaliacao.getNota(),
+                avaliacao.getComentario(), avaliacao.getAvaliador().getId());
     }
 }

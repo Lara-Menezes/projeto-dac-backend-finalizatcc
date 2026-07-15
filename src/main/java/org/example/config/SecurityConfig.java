@@ -23,6 +23,8 @@ public class SecurityConfig {
 
 
     private final JwtFilter jwtFilter;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final RestAccessDeniedHandler accessDeniedHandler;
 
 
     @Bean
@@ -57,15 +59,20 @@ public class SecurityConfig {
                         )
                 )
 
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
+
                 .authorizeHttpRequests(auth ->
                         auth
 
                                 .requestMatchers(
-                                        "/api/auth/**",
+                                        "/api/auth/login",
 
                                         // Cadastro
                                         "/api/alunos/create",
-                                        "/api/professores/create",
+                                        "/api/professores/register",
 
                                         // Swagger
                                         "/swagger-ui.html",
@@ -75,7 +82,17 @@ public class SecurityConfig {
                                 )
                                 .permitAll()
 
+                                // Governança: somente coordenadores.
+                                .requestMatchers(
+                                        "/api/coordenadores/**",
+                                        "/api/usuarios/**",
+                                        "/api/auditorias/**",
+                                        "/api/avaliadores/**"
+                                )
+                                .hasRole("COORDENADOR")
 
+                                // As regras por operação e propriedade ficam nos
+                                // controllers (@PreAuthorize) e services.
                                 .anyRequest()
                                 .authenticated()
 

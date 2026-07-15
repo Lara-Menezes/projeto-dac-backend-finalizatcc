@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +29,7 @@ public class ArquivoController {
     private final ArquivoService arquivoService;
 
     // Criar Arquivo manualmente
+    @PreAuthorize("hasRole('COORDENADOR')")
     @PostMapping("/create")
     public ResponseEntity<ArquivoResponseDTO> createArquivo(@Valid @RequestBody ArquivoRequestDTO request) {
         ArquivoResponseDTO response = arquivoService.save(request);
@@ -40,8 +42,10 @@ public class ArquivoController {
     public ResponseEntity<ArquivoResponseDTO> uploadArquivo(
             @RequestParam("file") MultipartFile file,
             @RequestParam("submissaoId") Long submissaoId,
-            @RequestParam(value = "tipo", defaultValue = "MANUSCRITO") TipoArquivo tipo) {
-        ArquivoResponseDTO response = arquivoService.upload(file, submissaoId, tipo);
+            @RequestParam(value = "tipo", defaultValue = "MANUSCRITO") TipoArquivo tipo,
+            Authentication authentication) {
+        ArquivoResponseDTO response = arquivoService.uploadForAluno(
+                file, submissaoId, tipo, authentication.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -68,8 +72,11 @@ public class ArquivoController {
 
     // Busca arquivo por Submissão ID
     @GetMapping("/submissao/{submissaoId}")
-    public ResponseEntity<List<ArquivoResponseDTO>> findBySubmissao(@PathVariable Long submissaoId) {
-        List<ArquivoResponseDTO> response = arquivoService.findBySubmissaoId(submissaoId);
+    @PreAuthorize("hasAnyRole('ALUNO','PROFESSOR','COORDENADOR')")
+    public ResponseEntity<List<ArquivoResponseDTO>> findBySubmissao(
+            @PathVariable Long submissaoId, Authentication authentication) {
+        List<ArquivoResponseDTO> response = arquivoService.findBySubmissaoAuthorized(
+                submissaoId, authentication.getName(), hasRole(authentication, "ROLE_COORDENADOR"));
         return ResponseEntity.ok(response);
     }
 
@@ -85,8 +92,10 @@ public class ArquivoController {
 
     //Dowload
     @GetMapping("/{id}/download")
-    public ResponseEntity<?> download(@PathVariable Long id) {
-        ArquivoDownload download = arquivoService.download(id);
+    @PreAuthorize("hasAnyRole('ALUNO','PROFESSOR','COORDENADOR')")
+    public ResponseEntity<?> download(@PathVariable Long id, Authentication authentication) {
+        ArquivoDownload download = arquivoService.downloadAuthorized(
+                id, authentication.getName(), hasRole(authentication, "ROLE_COORDENADOR"));
         String mimeType = download.mimeType() != null ? download.mimeType() : MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
         return ResponseEntity.ok()
@@ -122,15 +131,22 @@ public class ArquivoController {
     }
 
     //Visualizar sem baixar
-    @PreAuthorize("hasRole('COORDENADOR', 'PROFESSOR')")
+    @PreAuthorize("hasAnyRole('COORDENADOR', 'PROFESSOR')")
     @GetMapping("/{id}/visualizar")
-    public ResponseEntity<?> visualizar(@PathVariable Long id) {
+    public ResponseEntity<?> visualizar(@PathVariable Long id, Authentication authentication) {
 
-        ArquivoDownload download = arquivoService.download(id);
+        ArquivoDownload download = arquivoService.downloadAuthorized(
+                id, authentication.getName(), hasRole(authentication, "ROLE_COORDENADOR"));
 
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
                 .body(download.resource());
+    }
+
+    private boolean hasRole(Authentication authentication, String role) {
+        return authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(role::equals);
     }
 }

@@ -47,12 +47,13 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities(){
-
-        return List.of(
-                new SimpleGrantedAuthority(
-                        "ROLE_" + tipo.name()
-                )
-        );
+        if (tipo == TipoUsuario.COORDENADOR) {
+            return List.of(
+                    new SimpleGrantedAuthority("ROLE_PROFESSOR"),
+                    new SimpleGrantedAuthority("ROLE_COORDENADOR")
+            );
+        }
+        return List.of(new SimpleGrantedAuthority("ROLE_" + tipo.name()));
 
     }
 
@@ -77,6 +78,6 @@ public class Usuario implements UserDetails {
 
 
     @Override
-    public boolean isEnabled(){ return ativo;}
+    public boolean isEnabled(){ return Boolean.TRUE.equals(ativo);}
 
 }

@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Long> {
     List<Avaliacao> findByAvaliadorId(Long avaliadorId);
+    List<Avaliacao> findByAvaliadorProfessorUsuarioEmail(String email);
+    List<Avaliacao> findByAvaliadorBancaTccAlunoUsuarioEmail(String email);
 }

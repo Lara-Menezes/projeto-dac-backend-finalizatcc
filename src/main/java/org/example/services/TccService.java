@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.dto.request.TccRequestDTO;
 import org.example.dto.response.TccResponseDTO;
 import org.example.model.*;
+import org.example.enums.StatusTcc;
 import org.example.repositories.*;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,35 @@ public class TccService {
         return toResponse(tccRepository.save(tcc));
     }
 
+    public TccResponseDTO saveForAluno(String email, TccRequestDTO request) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Aluno aluno = alunoRepository.findById(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+        if (!tccRepository.findByAlunoId(aluno.getId()).isEmpty()) {
+            throw new RuntimeException("Aluno já possui TCC cadastrado");
+        }
+
+        AreaPesquisa area = findAreaOrNull(request.getAreaId());
+        Professor orientador = professorRepository.findById(request.getOrientadorId())
+                .orElseThrow(() -> new RuntimeException("Orientador não encontrado"));
+        Professor coorientador = findProfessorOrNull(request.getCoorientadorId(), "Coorientador não encontrado");
+
+        Tcc tcc = Tcc.builder()
+                .titulo(request.getTitulo())
+                .resumo(request.getResumo())
+                .area(area)
+                .aluno(aluno)
+                .orientador(orientador)
+                .coorientador(coorientador)
+                .status(StatusTcc.EM_DESENVOLVIMENTO)
+                .dataInicio(request.getDataInicio())
+                .dataFim(request.getDataFim())
+                .build();
+        return toResponse(tccRepository.save(tcc));
+    }
+
     // Busca todos os TCCs
     public List<TccResponseDTO> findAll() {
         return tccRepository.findAll().stream()
@@ -59,9 +89,9 @@ public class TccService {
         Tcc tcc = tccRepository.findByAlunoId(usuario.getId())
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("TCC não encontrado"));
+                .orElse(null);
 
-        return toResponse(tcc);
+        return tcc == null ? null : toResponse(tcc);
     }
 
     // Busca por Aluno ID
@@ -74,6 +104,17 @@ public class TccService {
     // Busca por Professor ID
     public List<TccResponseDTO> findByProfessorId(Long professorId) {
         return tccRepository.findByOrientadorId(professorId).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public List<TccResponseDTO> findByProfessorEmail(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        return java.util.stream.Stream.concat(
+                        tccRepository.findByOrientadorId(usuario.getId()).stream(),
+                        tccRepository.findByCoorientadorId(usuario.getId()).stream())
+                .distinct()
                 .map(this::toResponse)
                 .toList();
     }
@@ -114,7 +155,7 @@ public class TccService {
         tcc.setArea(area);
         tcc.setOrientador(orientador);
         tcc.setCoorientador(coorientador);
-        tcc.setStatus(request.getStatus());
+        // O aluno pode editar o projeto, mas não promover o próprio status.
         tcc.setDataInicio(request.getDataInicio());
         tcc.setDataFim(request.getDataFim());
 

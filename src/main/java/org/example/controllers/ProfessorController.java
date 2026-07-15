@@ -22,6 +22,7 @@ public class ProfessorController {
     private final ProfessorService professorService;
 
     // Criar Professor
+    @PreAuthorize("hasRole('COORDENADOR')")
     @PostMapping("/create")
     public ResponseEntity<ProfessorResponseDTO> createProfessor(@Valid @RequestBody(required = true) ProfessorRequestDTO request) {
         ProfessorResponseDTO response = professorService.save(request);
@@ -36,6 +37,18 @@ public class ProfessorController {
         List<ProfessorResponseDTO> response = professorService.findAll();
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<ProfessorResponseDTO> registerProfessor(
+            @Valid @RequestBody ProfessorRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(professorService.register(request));
+    }
+
+    @PreAuthorize("hasAnyRole('ALUNO','COORDENADOR')")
+    @GetMapping("/orientadores")
+    public ResponseEntity<List<ProfessorResponseDTO>> listOrientadores() {
+        return ResponseEntity.ok(professorService.findAll());
     }
 
     // Retorna os dados do professor autenticado

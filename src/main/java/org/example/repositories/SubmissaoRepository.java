@@ -12,5 +12,6 @@ public interface SubmissaoRepository extends JpaRepository<Submissao, Long> {
     List<Submissao> findByTccId(Long tccId);
     List<Submissao> findByTccAlunoUsuarioEmail(String email);
     List<Submissao> findByTccOrientadorUsuarioEmail(String email);
+    List<Submissao> findByTccCoorientadorUsuarioEmail(String email);
     List<Submissao> findByStatus(StatusSubmissao status);
 }

@@ -7,6 +7,8 @@ import org.example.dto.response.AvaliacaoResponseDTO;
 import org.example.services.AvaliacaoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,13 +21,16 @@ public class AvaliacaoController {
     private final AvaliacaoService avaliacaoService;
 
     // Criar Avaliação
+    @PreAuthorize("hasRole('PROFESSOR')")
     @PostMapping("/create")
-    public ResponseEntity<AvaliacaoResponseDTO> createAvaliacao(@Valid @RequestBody AvaliacaoRequestDTO request) {
-        AvaliacaoResponseDTO response = avaliacaoService.save(request);
+    public ResponseEntity<AvaliacaoResponseDTO> createAvaliacao(Authentication authentication,
+                                                                 @Valid @RequestBody AvaliacaoRequestDTO request) {
+        AvaliacaoResponseDTO response = avaliacaoService.saveForProfessor(authentication.getName(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // Listar todas as avaliações
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping
     public ResponseEntity<List<AvaliacaoResponseDTO>> listAll() {
 
@@ -34,7 +39,20 @@ public class AvaliacaoController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasRole('ALUNO')")
+    @GetMapping("/me")
+    public ResponseEntity<List<AvaliacaoResponseDTO>> minhasAvaliacoes(Authentication authentication) {
+        return ResponseEntity.ok(avaliacaoService.findForAluno(authentication.getName()));
+    }
+
+    @PreAuthorize("hasRole('PROFESSOR')")
+    @GetMapping("/professor/me")
+    public ResponseEntity<List<AvaliacaoResponseDTO>> avaliacoesDoProfessor(Authentication authentication) {
+        return ResponseEntity.ok(avaliacaoService.findForProfessor(authentication.getName()));
+    }
+
     // Buscar avaliação por ID
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<AvaliacaoResponseDTO> findById(@PathVariable Long id) {
 
@@ -44,6 +62,7 @@ public class AvaliacaoController {
     }
 
     // Atualizar avaliação
+    @PreAuthorize("hasRole('COORDENADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<AvaliacaoResponseDTO> updateAvaliacao(
             @PathVariable Long id,
@@ -55,6 +74,7 @@ public class AvaliacaoController {
     }
 
     // Deletar Avaliação
+    @PreAuthorize("hasRole('COORDENADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAvaliacao(@PathVariable Long id) {
         avaliacaoService.deleteById(id);

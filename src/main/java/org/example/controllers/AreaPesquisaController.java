@@ -8,6 +8,7 @@ import org.example.dto.response.AreaPesquisaResponseDTO;
 import org.example.services.AreaPesquisaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +19,7 @@ public class AreaPesquisaController {
     private final AreaPesquisaService areaPesquisaService;
 
     // Criar Área de Pesquisa
+    @PreAuthorize("hasRole('COORDENADOR')")
     @PostMapping("/create")
     public ResponseEntity<AreaPesquisaResponseDTO> createAreaPesquisa(@Valid @RequestBody AreaPesquisaRequestDTO request) {
         AreaPesquisaResponseDTO response = areaPesquisaService.save(request);
@@ -43,6 +45,7 @@ public class AreaPesquisaController {
     }
 
     // Atualizar Área de Pesquisa
+    @PreAuthorize("hasRole('COORDENADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<AreaPesquisaResponseDTO> updateAreaPesquisa(
             @PathVariable Long id,
@@ -54,6 +57,7 @@ public class AreaPesquisaController {
     }
 
     // Deletar Área de Pesquisa
+    @PreAuthorize("hasRole('COORDENADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAreaPesquisa(@PathVariable Long id) {
         areaPesquisaService.deleteById(id);

@@ -10,4 +10,6 @@ import java.util.List;
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     List<Feedback> findBySubmissaoId(Long submissaoId);
     List<Feedback> findByProfessorId(Long professorId);
+    List<Feedback> findBySubmissaoTccAlunoUsuarioEmail(String email);
+    List<Feedback> findByProfessorUsuarioEmail(String email);
 }

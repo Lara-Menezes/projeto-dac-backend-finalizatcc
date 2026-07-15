@@ -62,6 +62,36 @@ public class ProfessorService {
         );
     }
 
+    public ProfessorResponseDTO register(ProfessorRequestDTO request) {
+        request.setTipo(TipoUsuario.PROFESSOR);
+        request.setCoordenador(false);
+        return save(request);
+    }
+
+    public ProfessorResponseDTO createCoordenador(ProfessorRequestDTO request) {
+        request.setTipo(TipoUsuario.COORDENADOR);
+        request.setCoordenador(true);
+        return save(request);
+    }
+
+    public List<ProfessorResponseDTO> findCoordenadores() {
+        return professorRepository.findByUsuarioTipo(TipoUsuario.COORDENADOR).stream()
+                .map(this::toResponse).toList();
+    }
+
+    public ProfessorResponseDTO promoteToCoordenador(Long professorId) {
+        Professor professor = professorRepository.findById(professorId)
+                .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+        professor.getUsuario().setTipo(TipoUsuario.COORDENADOR);
+        usuarioRepository.save(professor.getUsuario());
+        return toResponse(professor);
+    }
+
+    private ProfessorResponseDTO toResponse(Professor professor) {
+        return new ProfessorResponseDTO(professor.getId(), professor.getUsuario().getNome(),
+                professor.getUsuario().getEmail(), professor.getAreaAtuacao(), professor.getTitulacao());
+    }
+
     // Listar
     public List<ProfessorResponseDTO> findAll() {
 
@@ -91,8 +121,8 @@ public class ProfessorService {
                 professor.getId(),
                 usuario.getNome(),
                 usuario.getEmail(),
-                professor.getTitulacao(),
-                professor.getAreaAtuacao()
+                professor.getAreaAtuacao(),
+                professor.getTitulacao()
         );
     }
 
