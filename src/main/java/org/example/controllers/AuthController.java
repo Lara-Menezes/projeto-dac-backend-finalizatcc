@@ -33,7 +33,6 @@ public class AuthController {
     public ResponseEntity<LoginResponseDTO> login(
             @Valid @RequestBody LoginRequestDTO request) {
 
-
         Authentication authentication =
                 authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(
@@ -48,12 +47,8 @@ public class AuthController {
                         .orElseThrow();
 
 
-        String token =
-                jwtService.gerarToken(usuario);
-
-
-        Long perfilId =
-                resolvePerfilId(usuario);
+        String token = jwtService.gerarToken(usuario);
+        Long perfilId = resolvePerfilId(usuario);
 
 
         LoginResponseDTO response =
@@ -65,23 +60,16 @@ public class AuthController {
                         usuario.getTipo()
                 );
 
-
         return ResponseEntity.ok(response);
     }
-
 
 
     @GetMapping("/me")
     public ResponseEntity<LoginResponseDTO> me(
             Authentication authentication) {
 
-
-        Usuario usuario =
-                (Usuario) authentication.getPrincipal();
-
-
-        Long perfilId =
-                resolvePerfilId(usuario);
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+        Long perfilId = resolvePerfilId(usuario);
 
 
         LoginResponseDTO response =
@@ -98,7 +86,6 @@ public class AuthController {
     }
 
 
-
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
 
@@ -113,7 +100,6 @@ public class AuthController {
     }
 
 
-
     private Long resolvePerfilId(Usuario usuario) {
 
 
@@ -125,7 +111,6 @@ public class AuthController {
 
         }
 
-
         if (usuario.getTipo() == TipoUsuario.PROFESSOR
                 || usuario.getTipo() == TipoUsuario.COORDENADOR) {
 
@@ -135,7 +120,6 @@ public class AuthController {
                     .orElse(usuario.getId());
 
         }
-
 
         return usuario.getId();
     }

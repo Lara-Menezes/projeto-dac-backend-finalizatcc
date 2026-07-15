@@ -26,75 +26,59 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UsuarioDetailsService usuarioDetailsService;
 
 
-
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain chain)
-
             throws IOException, ServletException {
 
-
-
-        String header =
-                request.getHeader("Authorization");
-
-
+        String header = request.getHeader("Authorization");
 
         if(header != null && header.startsWith("Bearer ")) {
 
+            try {
 
-            String token =
-                    header.substring(7);
+                String token = header.substring(7);
 
+                String email = jwtService.getEmail(token);
 
+                if (email != null &&
+                        SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            String email =
-                    jwtService.getEmail(token);
+                    Usuario usuario = usuarioDetailsService.loadUserByUsername(email);
 
+                    // Não autentica usuários inativos
+                    if (Boolean.FALSE.equals(usuario.getAtivo())) {
+                        chain.doFilter(request, response);
+                        return;
+                    }
 
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(
+                                    usuario,
+                                    null,
+                                    usuario.getAuthorities()
+                            );
 
-            if(email != null &&
-                    SecurityContextHolder
-                            .getContext()
-                            .getAuthentication() == null) {
+                    authentication.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request)
+                    );
+                    System.out.println("Usuário: " + usuario.getUsername());
+                    System.out.println("Authorities: " + usuario.getAuthorities());
 
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(authentication);
+                }
 
-
-                Usuario usuario =
-                        (Usuario) usuarioDetailsService
-                                .loadUserByUsername(email);
-
-
-
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                usuario,
-                                null,
-                                usuario.getAuthorities()
-                        );
-
-
-
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request)
-                );
-
-
-
-                SecurityContextHolder
-                        .getContext()
-                        .setAuthentication(authentication);
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
             }
-
         }
 
-
         chain.doFilter(request,response);
-
     }
-
 }
 

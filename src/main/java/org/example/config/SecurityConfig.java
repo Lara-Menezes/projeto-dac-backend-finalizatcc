@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -15,6 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 
 @Configuration
+@EnableMethodSecurity
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -28,7 +30,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration
@@ -37,12 +38,10 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-
     @Bean
     SecurityFilterChain filterChain(
             HttpSecurity http
     ) throws Exception {
-
 
         return http
 
@@ -63,7 +62,10 @@ public class SecurityConfig {
 
                                 .requestMatchers(
                                         "/api/auth/**",
-                                        "/api/usuarios/create",
+
+                                        // Cadastro
+                                        "/api/alunos/create",
+                                        "/api/professores/create",
 
                                         // Swagger
                                         "/swagger-ui.html",
@@ -79,15 +81,12 @@ public class SecurityConfig {
 
                 )
 
-
                 .addFilterBefore(
                         jwtFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
 
-
                 .build();
-
     }
 
 }

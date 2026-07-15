@@ -8,6 +8,7 @@ import org.example.dto.response.ProfessorResponseDTO;
 import org.example.enums.TipoUsuario;
 import org.example.model.*;
 import org.example.repositories.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class ProfessorService {
     private final UsuarioRepository usuarioRepository;
     private final AvaliadorRepository avaliadorRepository;
     private final TccRepository tccRepository;
+    private final PasswordEncoder passwordEncoder;
     private final BancaRepository bancaRepository;
 
     // Adicionar (Create)
@@ -36,7 +38,7 @@ public class ProfessorService {
         Usuario usuario = Usuario.builder()
                 .nome(request.getNome())
                 .email(request.getEmail())
-                .senha(request.getSenha()) // Nota: em produção, criptografar senha
+                .senha(passwordEncoder.encode(request.getSenha()))
                 .tipo(tipoUsuario)
                 .ativo(true)
                 .createdAt(LocalDateTime.now())
@@ -76,6 +78,24 @@ public class ProfessorService {
                 .toList();
     }
 
+    // Buscar por email
+    public ProfessorResponseDTO findByEmail(String email) {
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        Professor professor = professorRepository.findByUsuarioId(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+
+        return new ProfessorResponseDTO(
+                professor.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                professor.getTitulacao(),
+                professor.getAreaAtuacao()
+        );
+    }
+
     // Buscar por ID
     public ProfessorResponseDTO findById(Long id) {
 
@@ -92,7 +112,43 @@ public class ProfessorService {
         );
     }
 
-    // Atualizar
+    // Atualizar por email
+    public ProfessorResponseDTO updateByEmail(
+            String email,
+            ProfessorUpdateRequestDTO request) {
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        Professor professor = professorRepository.findByUsuarioId(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
+
+        if (request.getNome() != null && !request.getNome().isBlank()) {
+            usuario.setNome(request.getNome());
+        }
+
+        usuarioRepository.save(usuario);
+
+        if (request.getAreaAtuacao() != null && !request.getAreaAtuacao().isBlank()) {
+            professor.setAreaAtuacao(request.getAreaAtuacao());
+        }
+
+        if (request.getTitulacao() != null && !request.getTitulacao().isBlank()) {
+            professor.setTitulacao(request.getTitulacao());
+        }
+
+        professor = professorRepository.save(professor);
+
+        return new ProfessorResponseDTO(
+                professor.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                professor.getAreaAtuacao(),
+                professor.getTitulacao()
+        );
+    }
+
+    // Atualizar por id
     public ProfessorResponseDTO update(Long id, ProfessorUpdateRequestDTO request) {
 
         Professor professor = professorRepository.findById(id)

@@ -9,6 +9,8 @@ import org.example.dto.response.AlunoResponseDTO;
 import org.example.services.AlunoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,6 +28,7 @@ public class AlunoController {
     }
 
     // Listar Alunos
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping
     public ResponseEntity<List<AlunoResponseDTO>> listAll() {
 
@@ -34,7 +37,33 @@ public class AlunoController {
         return ResponseEntity.ok(response);
     }
 
+    // Retorna os dados do aluno autenticado
+    @PreAuthorize("hasRole('ALUNO')")
+    @GetMapping("/me")
+    public ResponseEntity<AlunoResponseDTO> me(Authentication authentication) {
+
+        return ResponseEntity.ok(
+                alunoService.findByEmail(authentication.getName())
+        );
+    }
+
+    // Atualiza os dados do aluno autenticado
+    @PreAuthorize("hasRole('ALUNO')")
+    @PutMapping("/me")
+    public ResponseEntity<AlunoResponseDTO> updateMe(
+            Authentication authentication,
+            @RequestBody AlunoUpdateRequestDTO request) {
+
+        return ResponseEntity.ok(
+                alunoService.updateByEmail(
+                        authentication.getName(),
+                        request
+                )
+        );
+    }
+
     // Buscar aluno por ID
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<AlunoResponseDTO> findById(@PathVariable Long id) {
 
@@ -43,7 +72,8 @@ public class AlunoController {
         return ResponseEntity.ok(response);
     }
 
-    // Atualizar Aluno
+    // Atualizar Aluno por ID
+    @PreAuthorize("hasRole('COORDENADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<AlunoResponseDTO> updateAluno(
             @PathVariable Long id,
@@ -55,6 +85,7 @@ public class AlunoController {
     }
 
     // Deletar Aluno
+    @PreAuthorize("hasRole('COORDENADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAluno(@PathVariable Long id) {
         alunoService.deleteById(id);

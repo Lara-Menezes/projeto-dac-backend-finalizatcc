@@ -8,6 +8,7 @@ import org.example.dto.response.AlunoResponseDTO;
 import org.example.enums.TipoUsuario;
 import org.example.model.*;
 import org.example.repositories.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class AlunoService {
     private final AvaliadorRepository avaliadorRepository;
     private final TccRepository tccRepository;
     private final BancaRepository bancaRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // Adicionar (Create)
     public AlunoResponseDTO save(AlunoRequestDTO request) {
@@ -29,7 +31,7 @@ public class AlunoService {
         Usuario usuario = Usuario.builder()
                 .nome(request.getNome())
                 .email(request.getEmail())
-                .senha(request.getSenha()) // Nota: em produção, criptografar senha
+                .senha(passwordEncoder.encode(request.getSenha()))
                 .tipo(TipoUsuario.ALUNO)
                 .ativo(true)
                 .createdAt(LocalDateTime.now())
@@ -72,6 +74,29 @@ public class AlunoService {
                 .toList();
     }
 
+    // Busca por email
+    public AlunoResponseDTO findByEmail(String email) {
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado")
+                );
+
+        Aluno aluno = alunoRepository.findById(usuario.getId())
+                .orElseThrow(() ->
+                        new RuntimeException("Aluno não encontrado")
+                );
+
+        return new AlunoResponseDTO(
+                aluno.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                aluno.getMatricula(),
+                aluno.getCurso(),
+                aluno.getPeriodo()
+        );
+    }
+
     // Buscar por ID
     public AlunoResponseDTO findById(Long id) {
 
@@ -89,7 +114,47 @@ public class AlunoService {
         );
     }
 
-    // Atualizar
+
+    // Atualizar por email
+    public AlunoResponseDTO updateByEmail(
+            String email,
+            AlunoUpdateRequestDTO request) {
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new RuntimeException("Usuário não encontrado"));
+
+        Aluno aluno = alunoRepository.findById(usuario.getId())
+                .orElseThrow(() ->
+                        new RuntimeException("Aluno não encontrado"));
+
+        if (request.getNome() != null && !request.getNome().isBlank()) {
+            usuario.setNome(request.getNome());
+        }
+
+        usuarioRepository.save(usuario);
+
+        if (request.getCurso() != null && !request.getCurso().isBlank()) {
+            aluno.setCurso(request.getCurso());
+        }
+
+        if (request.getPeriodo() != null) {
+            aluno.setPeriodo(request.getPeriodo());
+        }
+
+        aluno = alunoRepository.save(aluno);
+
+        return new AlunoResponseDTO(
+                aluno.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                aluno.getMatricula(),
+                aluno.getCurso(),
+                aluno.getPeriodo()
+        );
+    }
+
+    // Atualizar por id
     public AlunoResponseDTO update(Long id, AlunoUpdateRequestDTO request) {
 
         Aluno aluno = alunoRepository.findById(id)
