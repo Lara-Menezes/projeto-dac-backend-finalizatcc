@@ -193,6 +193,16 @@ public class ArquivoService {
                 .toList();
     }
 
+    // Buscar por Aluno email
+    public List<ArquivoResponseDTO> findByAlunoEmail(String email) {
+
+        return arquivoRepository
+                .findBySubmissaoTccAlunoUsuarioEmail(email)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
     // Listar por submissão
     public List<ArquivoResponseDTO> findBySubmissaoId(Long submissaoId) {
 

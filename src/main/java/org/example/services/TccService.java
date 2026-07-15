@@ -3,14 +3,8 @@ package org.example.services;
 import lombok.RequiredArgsConstructor;
 import org.example.dto.request.TccRequestDTO;
 import org.example.dto.response.TccResponseDTO;
-import org.example.model.Aluno;
-import org.example.model.AreaPesquisa;
-import org.example.model.Professor;
-import org.example.model.Tcc;
-import org.example.repositories.AlunoRepository;
-import org.example.repositories.AreaPesquisaRepository;
-import org.example.repositories.ProfessorRepository;
-import org.example.repositories.TccRepository;
+import org.example.model.*;
+import org.example.repositories.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +17,9 @@ public class TccService {
     private final AreaPesquisaRepository areaPesquisaRepository;
     private final AlunoRepository alunoRepository;
     private final ProfessorRepository professorRepository;
+    private final UsuarioRepository usuarioRepository;
 
+    // Cria TCC
     public TccResponseDTO save(TccRequestDTO request) {
         AreaPesquisa area = findAreaOrNull(request.getAreaId());
         Aluno aluno = alunoRepository.findById(request.getAlunoId())
@@ -47,24 +43,42 @@ public class TccService {
         return toResponse(tccRepository.save(tcc));
     }
 
+    // Busca todos os TCCs
     public List<TccResponseDTO> findAll() {
         return tccRepository.findAll().stream()
                 .map(this::toResponse)
                 .toList();
     }
 
+    // Busca por email
+    public TccResponseDTO findMeuTcc(String email) {
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        Tcc tcc = tccRepository.findByAlunoId(usuario.getId())
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("TCC não encontrado"));
+
+        return toResponse(tcc);
+    }
+
+    // Busca por Aluno ID
     public List<TccResponseDTO> findByAlunoId(Long alunoId) {
         return tccRepository.findByAlunoId(alunoId).stream()
                 .map(this::toResponse)
                 .toList();
     }
 
+    // Busca por Professor ID
     public List<TccResponseDTO> findByProfessorId(Long professorId) {
         return tccRepository.findByOrientadorId(professorId).stream()
                 .map(this::toResponse)
                 .toList();
     }
 
+    // Busca por TCC ID
     public TccResponseDTO findById(Long id) {
         Tcc tcc = tccRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("TCC nao encontrado"));
@@ -72,6 +86,42 @@ public class TccService {
         return toResponse(tcc);
     }
 
+    // Atualiza pelo email
+    public TccResponseDTO updateMeuTcc(
+            String email,
+            TccRequestDTO request) {
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        Tcc tcc = tccRepository.findByAlunoId(usuario.getId())
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("TCC não encontrado"));
+
+        AreaPesquisa area = findAreaOrNull(request.getAreaId());
+
+        Professor orientador = professorRepository.findById(request.getOrientadorId())
+                .orElseThrow(() -> new RuntimeException("Orientador não encontrado"));
+
+        Professor coorientador = findProfessorOrNull(
+                request.getCoorientadorId(),
+                "Coorientador não encontrado"
+        );
+
+        tcc.setTitulo(request.getTitulo());
+        tcc.setResumo(request.getResumo());
+        tcc.setArea(area);
+        tcc.setOrientador(orientador);
+        tcc.setCoorientador(coorientador);
+        tcc.setStatus(request.getStatus());
+        tcc.setDataInicio(request.getDataInicio());
+        tcc.setDataFim(request.getDataFim());
+
+        return toResponse(tccRepository.save(tcc));
+    }
+
+    // Atualiza por ID
     public TccResponseDTO update(Long id, TccRequestDTO request) {
         Tcc tcc = tccRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("TCC nao encontrado"));
@@ -96,6 +146,7 @@ public class TccService {
         return toResponse(tccRepository.save(tcc));
     }
 
+    // Deleta por TCC ID
     public void deleteById(Long id) {
         tccRepository.deleteById(id);
     }

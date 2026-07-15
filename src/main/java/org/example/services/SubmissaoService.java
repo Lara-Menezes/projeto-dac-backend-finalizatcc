@@ -60,6 +60,38 @@ public class SubmissaoService {
                 .toList();
     }
 
+    // Busca por Aluno email
+    public List<SubmissaoResponseDTO> findByAlunoEmail(String email) {
+
+        return submissaoRepository.findByTccAlunoUsuarioEmail(email)
+                .stream()
+                .map(submissao -> new SubmissaoResponseDTO(
+                        submissao.getId(),
+                        submissao.getVersao(),
+                        submissao.getDataEnvio(),
+                        submissao.getStatus(),
+                        submissao.getPrazoEntrega(),
+                        submissao.getTcc().getId()
+                ))
+                .toList();
+    }
+
+    // Busca por Professor email
+    public List<SubmissaoResponseDTO> findByProfessorEmail(String email) {
+
+        return submissaoRepository.findByTccOrientadorUsuarioEmail(email)
+                .stream()
+                .map(submissao -> new SubmissaoResponseDTO(
+                        submissao.getId(),
+                        submissao.getVersao(),
+                        submissao.getDataEnvio(),
+                        submissao.getStatus(),
+                        submissao.getPrazoEntrega(),
+                        submissao.getTcc().getId()
+                ))
+                .toList();
+    }
+
     public List<SubmissaoResponseDTO> findByTccId(Long tccId) {
         return submissaoRepository.findByTccId(tccId).stream()
                 .map(submissao -> new SubmissaoResponseDTO(

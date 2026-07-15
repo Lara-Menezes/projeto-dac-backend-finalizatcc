@@ -7,6 +7,8 @@ import org.example.dto.response.TccResponseDTO;
 import org.example.services.TccService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class TccController {
     private final TccService tccService;
 
     // Criar TCC
+    @PreAuthorize("hasRole('ALUNO')")
     @PostMapping("/create")
     public ResponseEntity<TccResponseDTO> createTcc(@Valid @RequestBody TccRequestDTO request) {
         TccResponseDTO response = tccService.save(request);
@@ -26,6 +29,7 @@ public class TccController {
     }
 
     // Listar TCCs
+    @PreAuthorize("hasRole('COORDENADOR')")
     @GetMapping
     public ResponseEntity<List<TccResponseDTO>> listAll() {
 
@@ -34,12 +38,26 @@ public class TccController {
         return ResponseEntity.ok(response);
     }
 
+    // TCC do aluno autenticado
+    @PreAuthorize("hasRole('ALUNO')")
+    @GetMapping("/me")
+    public ResponseEntity<TccResponseDTO> meuTcc(Authentication authentication) {
+
+        return ResponseEntity.ok(
+                tccService.findMeuTcc(authentication.getName())
+        );
+    }
+
+    // TCCs de um aluno
+    @PreAuthorize("hasAnyRole('COORDENADOR')")
     @GetMapping("/aluno/{alunoId}")
     public ResponseEntity<List<TccResponseDTO>> findByAluno(@PathVariable Long alunoId) {
         List<TccResponseDTO> response = tccService.findByAlunoId(alunoId);
         return ResponseEntity.ok(response);
     }
 
+    // TCCs de um professor
+    @PreAuthorize("hasAnyRole('PROFESSOR','COORDENADOR')")
     @GetMapping("/professor/{professorId}")
     public ResponseEntity<List<TccResponseDTO>> findByProfessor(@PathVariable Long professorId) {
         List<TccResponseDTO> response = tccService.findByProfessorId(professorId);
@@ -47,6 +65,7 @@ public class TccController {
     }
 
     // Buscar TCC por ID
+    @PreAuthorize("hasAnyRole('PROFESSOR','COORDENADOR')")
     @GetMapping("/{id}")
     public ResponseEntity<TccResponseDTO> findById(@PathVariable Long id) {
 
@@ -55,7 +74,23 @@ public class TccController {
         return ResponseEntity.ok(response);
     }
 
-    // Atualizar TCC
+    // Atualizar TCC do aluno autenticado
+    @PreAuthorize("hasRole('ALUNO')")
+    @PutMapping("/me")
+    public ResponseEntity<TccResponseDTO> atualizarMeuTcc(
+            Authentication authentication,
+            @RequestBody TccRequestDTO request) {
+
+        return ResponseEntity.ok(
+                tccService.updateMeuTcc(
+                        authentication.getName(),
+                        request
+                )
+        );
+    }
+
+    // Atualizar TCC por id
+    @PreAuthorize("hasAnyRole('COORDENADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<TccResponseDTO> updateTcc(
             @PathVariable Long id,
@@ -67,6 +102,7 @@ public class TccController {
     }
 
     // Deletar TCC
+    @PreAuthorize("hasRole('COORDENADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTcc(@PathVariable Long id) {
         tccService.deleteById(id);

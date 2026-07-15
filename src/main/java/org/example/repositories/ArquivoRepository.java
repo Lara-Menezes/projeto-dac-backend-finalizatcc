@@ -12,4 +12,5 @@ public interface ArquivoRepository extends JpaRepository<Arquivo, Long> {
     Optional<Arquivo> findById(Long id);
     List<Arquivo> findAll();
     List<Arquivo> findBySubmissaoId(Long submissaoId);
+    List<Arquivo> findBySubmissaoTccAlunoUsuarioEmail(String email);
 }
